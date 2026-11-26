@@ -34,6 +34,13 @@ it('creates a standalone starter with the exact packaged project skill', () => {
   expect(readFileSync(path.join(target, 'src/main.tsx'), 'utf8')).toContain(
     "from 'immerslides/player'",
   );
+  for (const entry of ['index.html', 'slides/index.html', 'site/index.html'])
+    expect(readFileSync(path.join(target, entry), 'utf8')).toContain(
+      '<div id="root"></div>',
+    );
+  expect(readFileSync(path.join(target, 'src/config.ts'), 'utf8')).toContain(
+    "defaultView: 'slides' | 'site' = 'slides'",
+  );
 });
 
 it('creates a starter in an existing empty directory', () => {

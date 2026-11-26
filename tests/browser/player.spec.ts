@@ -78,9 +78,11 @@ test('advances whole pages, restores progress, and supports the feature tour', a
   await expect(page.getByRole('dialog', { name: '放映操作' })).toContainText(
     '示範 Provider',
   );
-  await expect(
-    page.getByRole('link', { name: '功能速查講義' }),
-  ).toHaveAttribute('href', './handout.html');
+  expect(
+    await page
+      .getByRole('link', { name: '功能速查講義' })
+      .evaluate((link) => new URL((link as HTMLAnchorElement).href).pathname),
+  ).toBe('/handout.html');
   await page.keyboard.press('Escape');
   await page.screenshot({ path: 'artifacts/extensions-desktop.png' });
 });

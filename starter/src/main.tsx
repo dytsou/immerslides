@@ -1,7 +1,13 @@
 import { Player } from 'immerslides/player';
-import { createRoot } from 'react-dom/client';
-import 'immerslides/styles.css';
+import { Site } from 'immerslides/site';
+import { defaultView } from './config';
 import { deck } from './deck';
-import './styles.css';
+import { mount } from './mount';
 
-createRoot(document.getElementById('root')!).render(<Player deck={deck} />);
+mount(
+  defaultView === 'site' ? (
+    <Site deck={deck} presentationHref="./slides/" />
+  ) : (
+    <Player deck={deck} />
+  ),
+);

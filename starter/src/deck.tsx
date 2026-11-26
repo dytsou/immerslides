@@ -9,6 +9,7 @@ import {
   getSlideHref,
   HighlightedCode,
   type PlayerControlsProps,
+  SiteStory,
   SlideFrame,
   type SlideFrameProps,
   type SlideId,
@@ -188,7 +189,14 @@ function Flow({ step, still }: SlideRenderProps) {
       <p className="immerslides-lead">
         三個有意義的階段，每次把焦點移到正在講的節點。
       </p>
-      <Timeline items={flowItems} steps={flowSteps} step={step} still={still} />
+      <SiteStory steps={flowSteps} step={step}>
+        <Timeline
+          items={flowItems}
+          steps={flowSteps}
+          step={step}
+          still={still}
+        />
+      </SiteStory>
       <p className="immerslides-note">
         不提供 steps 時，Timeline 會直接呈現完整流程。可在同一步聚焦多個節點。
       </p>
@@ -199,15 +207,17 @@ function Flow({ step, still }: SlideRenderProps) {
 function Code({ step, still }: SlideRenderProps) {
   return (
     <>
-      <CodeBlock
-        filename="register.ts · TypeScript"
-        language="ts"
-        steps={codeSteps}
-        step={step}
-        still={still}
-      >
-        {registrationCode}
-      </CodeBlock>
+      <SiteStory steps={codeSteps} step={step}>
+        <CodeBlock
+          filename="register.ts · TypeScript"
+          language="ts"
+          steps={codeSteps}
+          step={step}
+          still={still}
+        >
+          {registrationCode}
+        </CodeBlock>
+      </SiteStory>
       <p className="demo-walkthrough-caption">
         按 → / Space 講下一段，← 返回。保留原始文字、縮排與空白行。
       </p>
@@ -242,43 +252,49 @@ function Languages() {
 function Composition({ step, still }: SlideRenderProps) {
   const current = codeSteps[step];
   return (
-    <div className="demo-composition" data-step={step}>
-      <div>
-        <StepDescription
-          title={current.title}
-          step={step}
-          count={codeSteps.length}
-        >
-          {current.detail}
-        </StepDescription>
-        <CodeWindow filename="register.ts · 自訂組合">
-          <HighlightedCode language="ts" focus={current.lines} still={still}>
-            {registrationCode}
-          </HighlightedCode>
-        </CodeWindow>
-      </div>
-      <ol className="demo-vertical-flow" aria-label="程式碼對應流程">
-        {flowItems.map((item, index) => (
-          <li key={item.id}>
-            <FlowNode
-              title={item.title}
-              status={
-                index === step ? 'active' : index < step ? 'complete' : 'idle'
-              }
-            >
-              {item.detail}
-            </FlowNode>
-            {index < flowItems.length - 1 && (
-              <FlowConnector
+    <SiteStory steps={codeSteps} step={step}>
+      <div className="demo-composition" data-step={step}>
+        <div>
+          <StepDescription
+            title={current.title}
+            step={step}
+            count={codeSteps.length}
+          >
+            {current.detail}
+          </StepDescription>
+          <CodeWindow filename="register.ts · 自訂組合">
+            <HighlightedCode language="ts" focus={current.lines} still={still}>
+              {registrationCode}
+            </HighlightedCode>
+          </CodeWindow>
+        </div>
+        <ol className="demo-vertical-flow" aria-label="程式碼對應流程">
+          {flowItems.map((item, index) => (
+            <li key={item.id}>
+              <FlowNode
+                title={item.title}
                 status={
-                  index < step ? 'complete' : index === step ? 'active' : 'idle'
+                  index === step ? 'active' : index < step ? 'complete' : 'idle'
                 }
-              />
-            )}
-          </li>
-        ))}
-      </ol>
-    </div>
+              >
+                {item.detail}
+              </FlowNode>
+              {index < flowItems.length - 1 && (
+                <FlowConnector
+                  status={
+                    index < step
+                      ? 'complete'
+                      : index === step
+                        ? 'active'
+                        : 'idle'
+                  }
+                />
+              )}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </SiteStory>
   );
 }
 
@@ -729,7 +745,10 @@ export const deck = defineDeck({
   Provider: DemoProvider,
   Controls: DemoControls,
   Navigator: DemoNavigator,
-  handout: { title: '功能速查講義', href: './handout.html' },
+  handout: {
+    title: '功能速查講義',
+    href: new URL(/* @vite-ignore */ '../handout.html', import.meta.url).href,
+  },
   Help: () => (
     <p className="help-copy">
       工具列的 ☆

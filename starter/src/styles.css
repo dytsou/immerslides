@@ -259,3 +259,43 @@ body {
     animation: none;
   }
 }
+@container immersite (width < 1200px) {
+  .demo-inventory {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 32px;
+  }
+  .demo-inventory button b {
+    font-size: 28px;
+  }
+  .demo-inventory button span {
+    font-size: 23px;
+  }
+  .immerslides-slide .demo-syntax-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .immerslides-slide .demo-syntax-grid .immerslides-code figcaption {
+    font-size: 20px;
+  }
+  .immerslides-slide .demo-syntax-grid .immerslides-code code {
+    font-size: 22px;
+  }
+  .immerslides-slide .demo-walkthrough-caption {
+    font-size: 24px;
+  }
+  .immerslides-slide .demo-composition {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .immerslides-slide .demo-composition .immerslides-step-explanation h2 {
+    font-size: 36px;
+  }
+  .immerslides-slide .demo-composition .immerslides-step-detail {
+    font-size: 25px;
+  }
+  .immerslides-slide .demo-composition code {
+    font-size: 24px;
+  }
+  .immerslides-slide .demo-vertical-flow .immerslides-flow-detail {
+    font-size: 24px;
+  }
+}

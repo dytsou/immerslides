@@ -48,6 +48,9 @@ for (const required of [
   'bin/immerslides.mjs',
   'starter/.nvmrc',
   'starter/src/deck.tsx',
+  'starter/src/config.ts',
+  'starter/slides/index.html',
+  'starter/site/index.html',
   'skills/immerslides/SKILL.md',
 ])
   assert(files.includes(required), `Packed archive contains ${required}`);
@@ -127,10 +130,9 @@ await writeFile(
     .join('\n') + '\n',
 );
 run('pnpm', ['build'], consumer);
-assert(
-  (await readdir(path.join(consumer, 'dist'))).includes('index.html'),
-  'Generated consumer builds a real HTML presentation',
-);
+const built = await readdir(path.join(consumer, 'dist'), { recursive: true });
+for (const entry of ['index.html', 'slides/index.html', 'site/index.html'])
+  assert(built.includes(entry), `Generated consumer builds ${entry}`);
 assert.equal(
   await readFile(
     path.join(consumer, '.agents/skills/immerslides/SKILL.md'),

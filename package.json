@@ -83,6 +83,8 @@
     "starter/index.html",
     "starter/package.json",
     "starter/public",
+    "starter/site",
+    "starter/slides",
     "starter/src",
     "starter/tsconfig.json",
     "starter/vite.config.ts",
