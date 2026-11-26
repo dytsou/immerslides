@@ -271,6 +271,18 @@ test('serves the fixed presentation entry and the configured home view', async (
   ).toHaveCount(0);
 });
 
+test('opens each entry without its trailing slash', async ({ page }) => {
+  await page.goto('/slides?from=link');
+  await expect(page.locator('.immerslides-player')).toBeVisible();
+  await expect(page.locator('.immersite')).toHaveCount(0);
+  expect(new URL(page.url()).pathname).toBe('/slides/');
+  expect(new URL(page.url()).search).toBe('?from=link');
+  await open(page, '/site#overview');
+  await expect(page.locator('.immerslides-player')).toHaveCount(0);
+  expect(new URL(page.url()).pathname).toBe('/site/');
+  await expect(front(page)).toHaveAttribute('data-page', 'overview');
+});
+
 test('stacks complete, static pages under reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await open(page, '/site/#code-walkthrough');

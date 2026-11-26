@@ -1,13 +1,14 @@
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { pageRedirects } from './starter/vite.config.js';
 import tsconfig from './tsconfig.json' with { type: 'json' };
 
 const { compilerOptions } = tsconfig;
 
 export default defineConfig({
   root: 'starter',
-  plugins: [react()],
+  plugins: [react(), pageRedirects()],
   resolve: {
     alias: [
       {
