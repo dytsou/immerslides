@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/verify.yml
+
+  publish:
+    name: Publish packages and GitHub release
+    if: github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Check release tag and select Node.js
+        id: release
+        shell: bash
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          tag="refs/tags/v${version}"
+          if git show-ref --verify --quiet "$tag"; then
+            if [ "$(git rev-parse "${tag}^{commit}")" != "$(git rev-parse HEAD)" ]; then
+              echo "::error::The package version tag already points to another commit."
+              exit 1
+            fi
+          fi
+          printf 'node-version=%s\n' "$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: pnpm build
+      - name: Publish npm package
+        uses: dytsou/release/npm-publish@291dd276baf77a9770947c5b4149e6fc866b8120 # v1
+        with:
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          node-version: ${{ steps.release.outputs.node-version }}
+          install-deps: "false"
+          verify-pack: "false"
+      - name: Select GitHub Packages metadata
+        shell: bash
+        run: |
+          owner="$(node -p 'process.env.GITHUB_REPOSITORY_OWNER.toLowerCase()')"
+          npm pkg set "name=@${owner}/immerslides" "repository.type=git" "repository.url=git+${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
+          npm pkg delete scripts.prepack
+      - name: Publish GitHub Packages package
+        uses: dytsou/release/github-packages@291dd276baf77a9770947c5b4149e6fc866b8120 # v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          node-version: ${{ steps.release.outputs.node-version }}
+          install-deps: "false"
+          verify-pack: "false"
+      - name: Restore npm metadata
+        if: always()
+        run: git restore -- package.json
+      - name: Create GitHub release
+        uses: dytsou/release/github@291dd276baf77a9770947c5b4149e6fc866b8120 # v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          from-package-json: "true"
+          create-missing-tag: "true"
+          move-major-tag: "true"
+          commit-notes: "true"
+          generate-release-notes: "true"
