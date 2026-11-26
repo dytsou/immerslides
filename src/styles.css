@@ -1497,7 +1497,7 @@
 .immersite[data-motion="animated"]
   .immersite-canvas
   > .immerslides-slide
-  > :is(.immerslides-rail, .immerslides-footer) {
+  > .immerslides-rail {
   opacity: var(--immersite-shared, 1);
 }
 .immersite[data-motion="animated"]
@@ -1505,6 +1505,7 @@
   > .immerslides-slide
   > .immerslides-footer {
   translate: 0 calc(var(--immersite-inner, 0px) * -1);
+  opacity: var(--immersite-settled, 1);
 }
 .immersite[data-motion="animated"]
   .immersite-canvas

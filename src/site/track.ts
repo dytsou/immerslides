@@ -22,6 +22,7 @@ export type PagePosition = {
   visible: boolean;
   front: boolean;
   shared: number;
+  settled: number;
 };
 
 export function createTrack(
@@ -90,6 +91,7 @@ export function readPosition(
     visible: distance < viewport,
     front: offset > -viewport / 2 && offset <= viewport / 2,
     shared: Math.max(0, Math.min(1, 5.5 - (10 * distance) / viewport)),
+    settled: Math.max(0, Math.min(1, 1.5 - (12.5 * distance) / viewport)),
   };
 }
 

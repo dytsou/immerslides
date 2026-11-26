@@ -51,6 +51,11 @@ describe('site track geometry', () => {
     expect(read(1, 450).shared).toBe(0);
     expect(read(0, 550).shared).toBe(0);
     expect(read(1, 550)).toMatchObject({ offset: 450, shared: 1 });
+    expect(read(0, 40)).toMatchObject({ shared: 1, settled: 1 });
+    expect(read(0, 80).settled).toBe(0.5);
+    expect(read(0, 120).settled).toBe(0);
+    expect(read(1, 880).settled).toBe(0);
+    expect(read(1, 960).settled).toBe(1);
     expect(read(1, 1700)).toMatchObject({ offset: -100, step: 2 });
     expect(read(1, 2700)).toMatchObject({ visible: false });
   });

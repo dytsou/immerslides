@@ -183,12 +183,14 @@ function SiteView({ deck, presentationHref }: SiteProps) {
           const shift = `${(position.offset - position.inner) / scale}px`;
           const inner = `${position.inner / scale}px`;
           const shared = String(position.shared);
-          const key = `${shift} ${inner} ${shared}`;
+          const settled = String(position.settled);
+          const key = `${shift} ${inner} ${shared} ${settled}`;
           if (written.current[index] !== key) {
             written.current[index] = key;
             section.style.setProperty('--immersite-shift', shift);
             section.style.setProperty('--immersite-inner', inner);
             section.style.setProperty('--immersite-shared', shared);
+            section.style.setProperty('--immersite-settled', settled);
           }
         }
       }
