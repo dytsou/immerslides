@@ -41,6 +41,8 @@ export type {
 } from './presentation/types.js';
 export { defineDeck } from './presentation/types.js';
 export { useReducedMotion } from './presentation/useReducedMotion.js';
+export type { SiteProps, SiteStoryProps } from './site/index.js';
+export { getSiteHref, Site, SiteStory } from './site/index.js';
 export { ChapterGuide } from './slides/ChapterGuide.js';
 export type { SlideFrameProps } from './slides/SlideFrame.js';
 export { SlideFrame } from './slides/SlideFrame.js';

@@ -23,6 +23,10 @@
       "types": "./dist/presentation/Player.d.ts",
       "import": "./dist/presentation/Player.js"
     },
+    "./site": {
+      "types": "./dist/site/index.d.ts",
+      "import": "./dist/site/index.js"
+    },
     "./slide-navigator": {
       "types": "./dist/presentation/SlideNavigator.d.ts",
       "import": "./dist/presentation/SlideNavigator.js"

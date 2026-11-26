@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { SiteContext } from '../site/context.js';
 import { inertActions } from './inertActions.js';
 import type { DeckDefinition, SlideId } from './types.js';
 
@@ -36,18 +37,20 @@ export function SlidePreview({ deck, slideId, step }: SlidePreviewProps) {
           width: deck.size.width,
           height: deck.size.height,
           transform: `scale(${scale})`,
-          visibility: scale ? 'visible' : 'hidden',
+          visibility: scale ? undefined : 'hidden',
         }}
       >
-        <deck.RenderSlide
-          slide={slide}
-          step={step ?? slide.steps - 1}
-          mode="preview"
-          still
-          active={false}
-          reducedMotion
-          actions={inertActions}
-        />
+        <SiteContext.Provider value={null}>
+          <deck.RenderSlide
+            slide={slide}
+            step={step ?? slide.steps - 1}
+            mode="preview"
+            still
+            active={false}
+            reducedMotion
+            actions={inertActions}
+          />
+        </SiteContext.Provider>
       </div>
     </div>
   );

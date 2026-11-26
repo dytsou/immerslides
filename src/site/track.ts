@@ -28,7 +28,7 @@ export function createTrack(
   pages: readonly PageMeasure[],
   viewport: number,
 ): Track {
-  const stepScroll = STEP_SCROLL * viewport;
+  const stepScroll = Math.round(STEP_SCROLL * viewport);
   let start = 0;
   const segments = pages.map((page, index) => {
     const overflow = Math.max(0, page.content - viewport);
@@ -89,7 +89,7 @@ export function readPosition(
     step,
     visible: distance < viewport,
     front: offset > -viewport / 2 && offset <= viewport / 2,
-    shared: Math.max(0, Math.min(1, 1.5 - (2 * distance) / viewport)),
+    shared: Math.max(0, Math.min(1, 5.5 - (10 * distance) / viewport)),
   };
 }
 

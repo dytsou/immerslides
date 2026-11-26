@@ -14,6 +14,7 @@
     "paths": {
       "immerslides": ["src/index.ts"],
       "immerslides/player": ["src/presentation/Player.tsx"],
+      "immerslides/site": ["src/site/index.ts"],
       "immerslides/slide-navigator": ["src/presentation/SlideNavigator.tsx"],
       "immerslides/slide-preview": ["src/presentation/SlidePreview.tsx"],
       "immerslides/slide-frame": ["src/slides/SlideFrame.tsx"],
