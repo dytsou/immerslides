@@ -37,6 +37,7 @@ type Anchor = { index: number; local: number; reduced: boolean };
 
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 1.5;
+const SNAP_DURATION = 320;
 
 const sameView = (a: View, b: View) =>
   a.step === b.step && a.active === b.active && a.front === b.front;
@@ -257,45 +258,59 @@ function SiteView({ deck, presentationHref }: SiteProps) {
 
   useEffect(() => {
     if (!ready || reduced || !track) return;
-    const snap = () => {
-      const y = -trackElement.current!.getBoundingClientRect().top;
-      const target = snapTarget(track, y);
-      if (target !== null)
-        window.scrollTo({
-          top: window.scrollY + target - y,
-          behavior: 'smooth',
-        });
-    };
-    if (window.onscrollend !== undefined) {
-      window.addEventListener('scrollend', snap);
-      return () => window.removeEventListener('scrollend', snap);
-    }
+    const scrollEnd = window.onscrollend !== undefined;
+    let frame = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let touching = false;
-    const schedule = () => {
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    };
+    const snap = () => {
+      if (frame || touching) return;
+      const from = window.scrollY;
+      const y = -trackElement.current!.getBoundingClientRect().top;
+      const target = snapTarget(track, y);
+      if (target === null) return;
+      const start = performance.now();
+      const glide = (now: number) => {
+        const progress = Math.min(1, (now - start) / SNAP_DURATION);
+        window.scrollTo({
+          top: from + (target - y) * (1 - (1 - progress) ** 3),
+          behavior: 'instant',
+        });
+        frame = progress < 1 ? requestAnimationFrame(glide) : 0;
+      };
+      frame = requestAnimationFrame(glide);
+    };
+    const settle = () => {
       clearTimeout(timer);
-      timer = setTimeout(() => {
-        if (!touching) snap();
-      }, 150);
+      timer = setTimeout(snap, 150);
     };
     const press = () => {
       touching = true;
-      clearTimeout(timer);
+      stop();
     };
     const release = () => {
       touching = false;
-      schedule();
+      if (!scrollEnd) settle();
     };
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('touchstart', press, { passive: true });
-    window.addEventListener('touchend', release);
-    window.addEventListener('touchcancel', release);
+    const listeners: [string, () => void][] = [
+      scrollEnd ? ['scrollend', snap] : ['scroll', settle],
+      ['wheel', stop],
+      ['keydown', stop],
+      ['pointerdown', stop],
+      ['touchstart', press],
+      ['touchend', release],
+      ['touchcancel', release],
+    ];
+    for (const [type, listener] of listeners)
+      window.addEventListener(type, listener, { passive: true });
     return () => {
+      stop();
       clearTimeout(timer);
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('touchstart', press);
-      window.removeEventListener('touchend', release);
-      window.removeEventListener('touchcancel', release);
+      for (const [type, listener] of listeners)
+        window.removeEventListener(type, listener);
     };
   }, [ready, reduced, track]);
 
