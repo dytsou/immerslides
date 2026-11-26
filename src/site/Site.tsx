@@ -61,6 +61,7 @@ function SiteView({ deck, presentationHref }: SiteProps) {
   const written = useRef<string[]>([]);
   const anchor = useRef<Anchor | null>(null);
   const started = useRef(false);
+  const shown = useRef(-1);
   const [viewport, setViewport] = useState<Viewport | null>(null);
   const [layouts, setLayouts] = useState<readonly (Layout | null)[]>(() =>
     deck.slides.map(() => null),
@@ -145,14 +146,6 @@ function SiteView({ deck, presentationHref }: SiteProps) {
     [pageTop],
   );
 
-  const scrollToHash = useCallback(() => {
-    const target = parseSiteHash(routes, window.location.hash);
-    const index = target
-      ? deck.slides.findIndex((slide) => slide.id === target.slideId)
-      : 0;
-    scrollToPage(index, target?.step ?? 0, 'instant');
-  }, [deck, routes, scrollToPage]);
-
   const update = useCallback(() => {
     const { track, reduced, viewport, layouts } = latest.current;
     if (!viewport || (!reduced && !track)) return;
@@ -200,6 +193,15 @@ function SiteView({ deck, presentationHref }: SiteProps) {
         anchor.current = { index, local, reduced: reduced || !track };
       return view;
     });
+    const front = next.findIndex((view) => view.front);
+    if (started.current && front >= 0 && front !== shown.current) {
+      shown.current = front;
+      const slide = deck.slides[front];
+      const href = siteHref(routes, slide.id);
+      if (window.location.hash !== href)
+        window.history.replaceState(window.history.state, '', withHash(href));
+      document.title = `${slide.title} · ${deck.title}`;
+    }
     setViews((current) =>
       next.every((view, index) => sameView(view, current[index]))
         ? current
@@ -207,14 +209,26 @@ function SiteView({ deck, presentationHref }: SiteProps) {
             sameView(view, current[index]) ? current[index] : view,
           ),
     );
-  }, [deck]);
+  }, [deck, routes]);
+
+  const scrollToHash = useCallback(
+    (hash: string) => {
+      const target = parseSiteHash(routes, hash);
+      const index = target
+        ? deck.slides.findIndex((slide) => slide.id === target.slideId)
+        : 0;
+      scrollToPage(index, target?.step ?? 0, 'instant');
+      update();
+    },
+    [deck, routes, scrollToPage, update],
+  );
 
   const geometry = reduced ? (measured ? layouts : null) : track;
   useLayoutEffect(() => {
     if (!geometry) return;
     if (!started.current) {
       started.current = true;
-      scrollToHash();
+      scrollToHash(window.location.hash);
       setReady(true);
     } else if (anchor.current) {
       const { index, local, reduced: anchored } = anchor.current;
@@ -254,11 +268,14 @@ function SiteView({ deck, presentationHref }: SiteProps) {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('hashchange', scrollToHash);
-    window.addEventListener('popstate', scrollToHash);
+    const changed = (event: HashChangeEvent) =>
+      scrollToHash(new URL(event.newURL).hash);
+    const traversed = () => scrollToHash(window.location.hash);
+    window.addEventListener('hashchange', changed);
+    window.addEventListener('popstate', traversed);
     return () => {
-      window.removeEventListener('hashchange', scrollToHash);
-      window.removeEventListener('popstate', scrollToHash);
+      window.removeEventListener('hashchange', changed);
+      window.removeEventListener('popstate', traversed);
     };
   }, [scrollToHash]);
 
@@ -321,14 +338,6 @@ function SiteView({ deck, presentationHref }: SiteProps) {
   }, [ready, reduced, track]);
 
   const frontIndex = views.findIndex((view) => view.front);
-  useEffect(() => {
-    if (!ready || frontIndex < 0) return;
-    const slide = deck.slides[frontIndex];
-    const href = siteHref(routes, slide.id);
-    if (window.location.hash !== href)
-      window.history.replaceState(window.history.state, '', withHash(href));
-    document.title = `${slide.title} · ${deck.title}`;
-  }, [deck, routes, ready, frontIndex]);
 
   const actions = useMemo(
     () =>
