@@ -1,8 +1,8 @@
 import type { DeckDefinition, PlaybackState, SlideId } from './types.js';
 
 type SlideTarget = Pick<PlaybackState, 'slideId' | 'step'>;
-type RouteDeck = Pick<DeckDefinition, 'slides' | 'chapters'>;
-type SlideRoutes = {
+export type RouteDeck = Pick<DeckDefinition, 'slides' | 'chapters'>;
+export type SlideRoutes = {
   slides: ReadonlyMap<SlideId, { slug: string; steps: number }>;
   targets: ReadonlyMap<string, SlideId>;
   pages: readonly SlideId[];
