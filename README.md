@@ -7,19 +7,19 @@
 ![Language: TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?logo=typescript&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
 ![Node.js 26+](https://img.shields.io/badge/Node.js-26%2B-339933?logo=nodedotjs&logoColor=white)
-![pnpm 11.29.0](https://img.shields.io/badge/pnpm-11.29.0-F69220?logo=pnpm&logoColor=white)
+![pnpm 12.20.0](https://img.shields.io/badge/pnpm-12.20.0-F69220?logo=pnpm&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 使用 React 製作沉浸式簡報，搭配可組合元件、簡報者模式與可重用的 agent skill。
 
 ## 預覽範例
 
-需要 Node.js 26 以上與 pnpm 11。專案與 starter 都提供 `.nvmrc`，並以 `packageManager` 固定 pnpm 版本。
+需要 Node.js 26 以上與 pnpm 12。專案與 starter 都提供 `.nvmrc`，並以 `packageManager` 固定 pnpm 版本。
 
 ```sh
 nvm install
 nvm use
-npm install --global pnpm@11.29.0
+npm install --global pnpm@12.20.0
 pnpm install
 pnpm build
 pnpm dev

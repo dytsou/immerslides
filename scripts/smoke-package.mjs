@@ -69,7 +69,7 @@ const host = path.join(temporary, 'host');
 await mkdir(host);
 await writeFile(
   path.join(host, 'package.json'),
-  JSON.stringify({ private: true, packageManager: 'pnpm@11.29.0' }),
+  JSON.stringify({ private: true, packageManager: 'pnpm@12.20.0' }),
 );
 run('pnpm', ['add', '--ignore-scripts', tarball], host);
 run(
