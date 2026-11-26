@@ -6,21 +6,22 @@
 
 依用途匯入單一元件。每個入口直接載入該元件與它需要的依賴。
 
-| 入口                           | 匯出                                                        |
-| ------------------------------ | ----------------------------------------------------------- |
-| `immerslides/code-window`      | `CodeWindow`、`CodeWindowProps`                             |
-| `immerslides/highlighted-code` | `HighlightedCode`、`HighlightedCodeProps`、`CodeLineRange`  |
-| `immerslides/code-block`       | `CodeBlock`、`CodeBlockProps`、`CodeStep`、`CodeLineRange`  |
-| `immerslides/flow-node`        | `FlowNode`、`FlowNodeProps`、`FlowStatus`、`FlowTone`       |
-| `immerslides/flow-connector`   | `FlowConnector`、`FlowConnectorProps`、`FlowStatus`         |
-| `immerslides/timeline`         | `Timeline`、`TimelineProps`、`TimelineItem`、`TimelineStep` |
-| `immerslides/step-description` | `StepDescription`、`StepDescriptionProps`                   |
-| `immerslides/slide-frame`      | `SlideFrame`、`SlideFrameProps`                             |
-| `immerslides/chapter-guide`    | `ChapterGuide`                                              |
-| `immerslides/slide-preview`    | `SlidePreview`、`SlidePreviewProps`                         |
-| `immerslides/slide-navigator`  | `SlideNavigator`                                            |
-| `immerslides/player`           | `Player`                                                    |
-| `immerslides/deck`             | `defineDeck` 與簡報型別                                     |
+| 入口                           | 匯出                                                              |
+| ------------------------------ | ----------------------------------------------------------------- |
+| `immerslides/code-window`      | `CodeWindow`、`CodeWindowProps`                                   |
+| `immerslides/highlighted-code` | `HighlightedCode`、`HighlightedCodeProps`、`CodeLineRange`        |
+| `immerslides/code-block`       | `CodeBlock`、`CodeBlockProps`、`CodeStep`、`CodeLineRange`        |
+| `immerslides/flow-node`        | `FlowNode`、`FlowNodeProps`、`FlowStatus`、`FlowTone`             |
+| `immerslides/flow-connector`   | `FlowConnector`、`FlowConnectorProps`、`FlowStatus`               |
+| `immerslides/timeline`         | `Timeline`、`TimelineProps`、`TimelineItem`、`TimelineStep`       |
+| `immerslides/step-description` | `StepDescription`、`StepDescriptionProps`                         |
+| `immerslides/slide-frame`      | `SlideFrame`、`SlideFrameProps`                                   |
+| `immerslides/chapter-guide`    | `ChapterGuide`                                                    |
+| `immerslides/slide-preview`    | `SlidePreview`、`SlidePreviewProps`                               |
+| `immerslides/slide-navigator`  | `SlideNavigator`                                                  |
+| `immerslides/player`           | `Player`                                                          |
+| `immerslides/site`             | `Site`、`SiteProps`、`SiteStory`、`SiteStoryProps`、`getSiteHref` |
+| `immerslides/deck`             | `defineDeck` 與簡報型別                                           |
 
 單獨使用 `CodeWindow` 不會載入 highlight.js。靜態預覽與基礎流程元件不會載入播放核心。既有根入口仍提供相同元件與型別。樣式只需匯入一次 `immerslides/styles.css`。
 

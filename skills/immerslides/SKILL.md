@@ -20,6 +20,7 @@ description: 使用 immerslides 建立或修改可自由組合的 React 沉浸�
 - 只使用部分元件時，從 `immerslides/code-window`、`immerslides/flow-node` 等獨立入口匯入。`defineDeck` 與簡報型別可從 `immerslides/deck` 匯入。完整入口見組合指南，不匯入套件內部路徑。
 - 需要講稿、下一頁預覽或簡報者視窗時閱讀 [presenter.md](references/presenter.md)。以每頁的 `notes` 保存純文字講稿，不把講稿畫在觀眾投影片上。
 - 需要直接連結、大綱或標題導覽時閱讀 [urls.md](references/urls.md)。使用 `slug` 與 `getSlideHref`，不另建路由或播放進度。
+- 需要讓讀者向下捲動閱讀同一份 deck 時閱讀 [site.md](references/site.md)。使用 `Site` 與 `SiteStory`，不另外複製內容或步驟資料。
 - 需要星號標記與篩選時閱讀 [authoring.md](references/authoring.md)。共用原有導覽視窗與標記資料，沿用套件的星號懸停、鍵盤與觸控操作。
 - 使用 pnpm 與專案 `packageManager` 指定的版本。保留 `pnpm-lock.yaml`，不新增其他套件管理器的 lockfile。發佈後的新專案入口為 `pnpm dlx immerslides create <directory>`。
 

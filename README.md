@@ -27,6 +27,8 @@ pnpm dev
 
 開啟終端機顯示的 Vite 網址。範例是一份功能導覽，讓你查看版型、流程圖、語法上色、逐段聚焦、自由組合、簡報者模式與播放能力，再決定哪些適合自己的教材。大部分頁面一次點擊換頁，另有明確標示的分段示範。
 
+同一份 deck 也能向下捲動閱讀。`/slides/` 固定開啟簡報，`/site/` 固定開啟直向網站，`/` 依 `starter/src/config.ts` 的 `defaultView` 決定。網站使用 `immerslides/site` 的 `Site` 元件，說明見 [site.md](skills/immerslides/references/site.md)。
+
 ## 從本機套件建立簡報
 
 套件目前尚未發佈至 npm。先在這個 repository 打包。
