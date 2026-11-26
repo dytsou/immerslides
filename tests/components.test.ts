@@ -6,12 +6,16 @@ import {
   CodeBlock,
   type CodeBlockProps,
   CodeWindow,
+  defineDeck,
   FlowConnector,
   FlowNode,
   HighlightedCode,
+  type PresentationActions,
+  SlideFrame,
   StepDescription,
   Timeline,
 } from '../src/index';
+import { inertActions } from '../src/presentation/inertActions';
 
 it('renders complete timelines and rejects flows that need another page', () => {
   const html = renderToStaticMarkup(
@@ -195,4 +199,38 @@ it('lets authors compose the same primitives without a player or context provide
       createElement(StepDescription, { title: 'Invalid', step: 2, count: 2 }),
     ),
   ).toThrow();
+});
+
+function EmptySlide() {
+  return null;
+}
+
+const railDeck = defineDeck({
+  id: 'rail-actions',
+  title: 'Rail',
+  size: { width: 1600, height: 900 },
+  slides: [
+    { id: 'one', title: 'One', steps: 1 },
+    { id: 'two', title: 'Two', steps: 1 },
+  ],
+  chapters: [
+    { id: 'first', title: 'First', slideId: 'one' },
+    { id: 'second', title: 'Second', slideId: 'two' },
+  ],
+  previews: [],
+  RenderSlide: EmptySlide,
+});
+
+it('enables chapter rail jumps when a renderer forwards its actions to SlideFrame', () => {
+  const render = (actions?: PresentationActions) =>
+    renderToStaticMarkup(
+      createElement(SlideFrame, {
+        deck: railDeck,
+        slide: railDeck.slides[0],
+        actions,
+        children: 'Body',
+      }),
+    );
+  expect(render()).toContain('disabled=""');
+  expect(render(inertActions)).not.toContain('disabled=""');
 });

@@ -1,5 +1,9 @@
 import type { ReactNode } from 'react';
-import type { DeckDefinition, SlideDefinition } from '../presentation/types.js';
+import type {
+  DeckDefinition,
+  PresentationActions,
+  SlideDefinition,
+} from '../presentation/types.js';
 import { ChapterRail, chapterPosition } from './ChapterRail.js';
 
 export type SlideFrameProps = {
@@ -9,6 +13,7 @@ export type SlideFrameProps = {
   footer?: ReactNode;
   still?: boolean;
   mode?: 'playback' | 'preview';
+  actions?: PresentationActions;
   children: ReactNode;
 };
 
@@ -19,6 +24,7 @@ export function SlideFrame({
   footer = deck.title,
   still = false,
   mode = 'playback',
+  actions,
   children,
 }: SlideFrameProps) {
   const index = deck.slides.findIndex((item) => item.id === slide.id);
@@ -34,7 +40,7 @@ export function SlideFrame({
       data-slide={slide.id}
       aria-label={slide.title}
     >
-      {rail && <ChapterRail deck={deck} slide={slide} />}
+      {rail && <ChapterRail deck={deck} slide={slide} onJump={actions?.jump} />}
       {layout === 'content' && (
         <header className="immerslides-heading">
           <p>{chapter?.title ?? deck.title}</p>
