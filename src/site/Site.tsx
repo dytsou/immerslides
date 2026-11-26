@@ -66,7 +66,11 @@ function SiteView({ deck, presentationHref }: SiteProps) {
     deck.slides.map(() => null),
   );
   const [views, setViews] = useState<readonly View[]>(() =>
-    deck.slides.map(() => ({ step: 0, active: false, front: false })),
+    deck.slides.map((slide) => ({
+      step: reduced ? slide.steps - 1 : 0,
+      active: false,
+      front: false,
+    })),
   );
   const [ready, setReady] = useState(false);
   const measured = layouts.every((layout) => layout !== null);
@@ -336,16 +340,19 @@ function SiteView({ deck, presentationHref }: SiteProps) {
           );
         };
         const step = () =>
-          latest.current.reduced
-            ? slide.steps - 1
-            : latest.current.views[index].step;
+          latest.current.reduced ? null : latest.current.views[index].step;
         return {
-          next: () =>
-            step() < slide.steps - 1 ? go(index, step() + 1) : go(index + 1, 0),
-          previous: () =>
-            step() > 0
-              ? go(index, step() - 1)
-              : go(index - 1, (deck.slides[index - 1]?.steps ?? 1) - 1),
+          next: () => {
+            const current = step();
+            if (current !== null && current < slide.steps - 1)
+              go(index, current + 1);
+            else go(index + 1, 0);
+          },
+          previous: () => {
+            const current = step();
+            if (current) go(index, current - 1);
+            else go(index - 1, (deck.slides[index - 1]?.steps ?? 1) - 1);
+          },
           nextSlide: () => go(index + 1, 0),
           previousSlide: () => go(index - 1, 0),
           jump: (id) => {
@@ -501,7 +508,7 @@ const SitePage = memo(function SitePage({
         <div className="immersite-canvas" ref={canvas}>
           <deck.RenderSlide
             slide={slide}
-            step={reduced ? slide.steps - 1 : view.step}
+            step={view.step}
             mode="playback"
             active={view.active}
             still={!view.active || reduced}
