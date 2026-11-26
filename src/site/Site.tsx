@@ -484,7 +484,9 @@ const SitePage = memo(function SitePage({
         design = apply(scale);
       }
       const content =
-        reduced || design > height / scale + 1 ? design * scale : height;
+        reduced || design > height / scale + 1
+          ? Math.ceil(design * scale)
+          : height;
       stage.current!.style.height = reduced ? `${content}px` : '';
       onLayout(index, { scale, content });
     };
