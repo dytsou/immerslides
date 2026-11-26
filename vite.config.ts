@@ -1,7 +1,9 @@
 import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
-import { compilerOptions } from './tsconfig.json';
+import tsconfig from './tsconfig.json' with { type: 'json' };
+
+const { compilerOptions } = tsconfig;
 
 export default defineConfig({
   root: 'starter',
