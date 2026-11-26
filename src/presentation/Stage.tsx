@@ -117,7 +117,11 @@ export function PresentationStage() {
     const animations = Array.isArray(result) ? result : [result];
     const finish = () => {
       if (!alive) return;
-      if (outgoing) outgoing.style.visibility = 'hidden';
+      // Opacity, unlike visibility, cannot be re-enabled by descendants (the
+      // viewport and slide content may set `visibility: visible`). Canceling
+      // drops the fill, so the outgoing layer must stay invisible until React
+      // removes it in a later task, or the old page flashes for one frame.
+      if (outgoing) outgoing.style.opacity = '0';
       animations.forEach((animation) => {
         animation.cancel();
       });

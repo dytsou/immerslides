@@ -143,6 +143,48 @@ test('keeps the chapter rail mounted and smoothly retargets chapter movement', a
   await page.screenshot({ path: 'artifacts/guide-desktop.png' });
 });
 
+test('never paints the outgoing page again after its transition ends', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await jump(page, 'composition');
+  await page.evaluate(() => {
+    const store = window as unknown as { staleFrames: string[] };
+    store.staleFrames = [];
+    const sample = () => {
+      const outgoing = document.querySelector<HTMLElement>('.page-outgoing');
+      const slide = outgoing?.querySelector<HTMLElement>('.immerslides-slide');
+      if (
+        outgoing &&
+        slide &&
+        !outgoing.getAnimations().length &&
+        slide.checkVisibility({
+          opacityProperty: true,
+          visibilityProperty: true,
+        })
+      )
+        store.staleFrames.push(slide.dataset.slide!);
+      requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+  });
+  for (const [key, id] of [
+    ['PageDown', 'previews'],
+    ['PageUp', 'composition'],
+    ['PageDown', 'previews'],
+    ['PageUp', 'composition'],
+  ]) {
+    await page.keyboard.press(key);
+    await expect(current(page)).toHaveAttribute('data-slide', id);
+    await expect(page.locator('.page-outgoing')).toHaveCount(0);
+  }
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { staleFrames: string[] }).staleFrames,
+    ),
+  ).toEqual([]);
+});
+
 test('uses reduced motion and keeps the fixed stage in a narrow viewport', async ({
   page,
 }) => {
