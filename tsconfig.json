@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "immerslides": ["src/index.ts"],
+      "immerslides/player": ["src/presentation/Player.tsx"],
+      "immerslides/slide-navigator": ["src/presentation/SlideNavigator.tsx"],
+      "immerslides/slide-preview": ["src/presentation/SlidePreview.tsx"],
+      "immerslides/slide-frame": ["src/slides/SlideFrame.tsx"],
+      "immerslides/chapter-guide": ["src/slides/ChapterGuide.tsx"],
+      "immerslides/code-block": ["src/code/CodeBlock.tsx"],
+      "immerslides/code-window": ["src/code/CodeWindow.tsx"],
+      "immerslides/highlighted-code": ["src/code/HighlightedCode.tsx"],
+      "immerslides/timeline": ["src/flow/Timeline.tsx"],
+      "immerslides/flow-node": ["src/flow/FlowNode.tsx"],
+      "immerslides/flow-connector": ["src/flow/FlowConnector.tsx"],
+      "immerslides/step-description": ["src/walkthrough/StepDescription.tsx"],
+      "immerslides/deck": ["src/presentation/types.ts"]
+    }
+  },
+  "include": [
+    "src",
+    "starter/src",
+    "tests",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "vitest.config.ts"
+  ]
+}

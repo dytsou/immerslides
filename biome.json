@@ -1,0 +1,88 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.8/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["**", "!starter/public/favicon.svg"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "assist": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": {
+          "level": "error",
+          "options": {
+            "reportUnnecessaryDependencies": false
+          }
+        }
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.css"],
+      "linter": {
+        "rules": {
+          "style": { "noDescendingSpecificity": "off" },
+          "complexity": { "noImportantStyles": "off" }
+        }
+      }
+    },
+    {
+      "includes": ["src/code/HighlightedCode.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": { "noArrayIndexKey": "off" },
+          "a11y": {
+            "noNoninteractiveTabindex": "off",
+            "useSemanticElements": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["tests/**/*.ts"],
+      "linter": {
+        "rules": { "correctness": { "noChildrenProp": "off" } }
+      }
+    },
+    {
+      "includes": ["src/presentation/Modal.tsx"],
+      "linter": {
+        "rules": { "a11y": { "useKeyWithClickEvents": "off" } }
+      }
+    },
+    {
+      "includes": ["src/presentation/PlayerToolbar.tsx"],
+      "linter": {
+        "rules": { "a11y": { "noStaticElementInteractions": "off" } }
+      }
+    },
+    {
+      "includes": ["src/presentation/SlideNavigator.tsx"],
+      "linter": {
+        "rules": { "a11y": { "useSemanticElements": "off" } }
+      }
+    }
+  ],
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single"
+    }
+  }
+}

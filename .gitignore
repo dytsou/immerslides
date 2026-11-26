@@ -1,0 +1,9 @@
+node_modules/
+dist/
+starter/dist/
+artifacts/
+test-results/
+playwright-report/
+.audit/
+*.tgz
+.DS_Store
