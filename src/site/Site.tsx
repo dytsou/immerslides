@@ -323,7 +323,13 @@ function SiteView({
     };
     const settle = () => {
       clearTimeout(timer);
-      timer = setTimeout(snap, 150);
+      timer = setTimeout(() => {
+        timer = undefined;
+        snap();
+      }, 150);
+    };
+    const moving = () => {
+      if (timer !== undefined) settle();
     };
     const press = () => {
       touching = true;
@@ -334,7 +340,8 @@ function SiteView({
       if (!scrollEnd) settle();
     };
     const listeners: [string, () => void][] = [
-      scrollEnd ? ['scrollend', snap] : ['scroll', settle],
+      scrollEnd ? ['scrollend', settle] : ['scroll', settle],
+      ['scroll', moving],
       ['wheel', stop],
       ['keydown', stop],
       ['pointerdown', stop],
