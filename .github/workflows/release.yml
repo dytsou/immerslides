@@ -45,6 +45,7 @@ jobs:
     permissions:
       contents: write
       packages: write
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -69,10 +70,9 @@ jobs:
           printf 'node-version=%s\n' "$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm build
-      - name: Publish npm package
-        uses: dytsou/release/npm-publish@74e93b8e51ecbecc233e39e03fc1c91c1300a68e # v1.4.0
+      - name: Publish npm package with trusted publishing
+        uses: dytsou/release/npm-publish@2cd0db49a208aa8c039390cfc94f9ca8222ff86e # v1.4.1
         with:
-          npm-token: ${{ secrets.NPM_TOKEN }}
           node-version: ${{ steps.release.outputs.node-version }}
           install-deps: "false"
           verify-pack: "false"
