@@ -1,6 +1,6 @@
 {
   "name": "immerslides",
-  "version": "1.0.0-beta-2",
+  "version": "1.0.0-beta-3",
   "description": "React presentations with immersive code and flow walkthroughs.",
   "license": "MIT",
   "type": "module",
