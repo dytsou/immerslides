@@ -10,41 +10,64 @@
 ![pnpm 12.20.0](https://img.shields.io/badge/pnpm-12.20.0-F69220?logo=pnpm&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-使用 React 製作沉浸式簡報，搭配可組合元件、簡報者模式與可重用的 agent skill。
+React presentations with immersive code and flow walkthroughs. Build slides from composable React components, step through code and flows one focus at a time, and publish the same deck as a scrolling reading site.
 
-## 預覽範例
+**English** | [繁體中文](README.zh-TW.md)
 
-需要 Node.js 26 以上與 pnpm 12。專案與 starter 都提供 `.nvmrc`，並以 `packageManager` 固定 pnpm 版本。
+## Features
+
+- **Full-page clicks.** One click advances to the next complete slide. Extra steps are added only where a talk needs them.
+- **Immersive code walkthroughs.** `CodeBlock` shows highlighted code, and `CodeWindow` provides the window frame. Syntax highlighting covers languages such as TypeScript, Python, Java, SQL, JSON, YAML, Bash, HTML, and CSS.
+- **Flow timelines.** `Timeline`, `FlowNode`, and `FlowConnector` show processes and their steps.
+- **Presenter mode.** Press `P` to open a window with the current slide, the next slide, speaker notes, and a timer.
+- **Slide navigator.** Press `O` to browse chapters and slides as an outline or as thumbnails, and filter by marked slides.
+- **Shareable URLs.** Every slide and step has a hash URL, such as `/#/code-walkthrough?step=2`. URLs survive reloads and work with browser history.
+- **Scrolling site view.** `Site` and `SiteStory` render the same deck as a long-form reading page.
+- **Reduced motion.** When the user prefers reduced motion, transitions are disabled and all content stays visible.
+- **Agent skill.** A bundled skill helps AI coding agents write and revise decks.
+
+## Requirements
+
+- Node.js 26 or later (see [`.nvmrc`](.nvmrc))
+- pnpm 12.20.0 (pinned by the `packageManager` field)
 
 ```sh
 nvm install
 nvm use
 npm install --global pnpm@12.20.0
 pnpm install
-pnpm build
+```
+
+## Quick start: run the demo
+
+```sh
 pnpm dev
 ```
 
-開啟終端機顯示的 Vite 網址。範例是一份功能導覽，讓你查看版型、流程圖、語法上色、逐段聚焦、自由組合、簡報者模式與播放能力，再決定哪些適合自己的教材。大部分頁面一次點擊換頁，另有明確標示的分段示範。
+Open the URL that Vite prints. By default this is `http://127.0.0.1:5173/`. The demo is a feature tour that covers layouts, flow diagrams, syntax highlighting, step-by-step focus, composition, presenter mode, and playback. Most slides advance with one click, and slides with extra steps are labeled.
 
-同一份 deck 也能向下捲動閱讀。`/slides/` 固定開啟簡報，`/site/` 固定開啟直向網站，`/` 依 `starter/src/config.ts` 的 `defaultView` 決定。網站使用 `immerslides/site` 的 `Site` 元件，說明見 [site.md](skills/immerslides/references/site.md)。
+The demo lives in [`starter/`](starter/):
 
-## 從本機套件建立簡報
+- `/` shows the view set by `defaultView` in `starter/src/config.ts`.
+- `/slides/` always shows the presentation.
+- `/site/` always shows the scrolling site.
 
-套件目前尚未發佈至 npm。先在這個 repository 打包。
+## Create a new presentation
+
+The package is not yet published to npm. For now, pack this repository and create a project from the tarball:
 
 ```sh
 pnpm pack --out immerslides.tgz
-immerslides_package_tarball="$PWD/immerslides.tgz"
-node bin/immerslides.mjs create /tmp/my-presentation
-cd /tmp/my-presentation
-pnpm add "$immerslides_package_tarball"
+TARBALL="$PWD/immerslides.tgz"
+node bin/immerslides.mjs create ../my-presentation
+cd ../my-presentation
+pnpm add "$TARBALL"
 pnpm dev
 ```
 
-將 tarball 路徑換成實際檔案位置。建立指令不會安裝依賴，也不會覆寫非空目錄。產生的專案使用公開的 `immerslides` 套件入口，不依賴這個 repository 的參考資料。
+The `create` command copies the starter project and the agent skill into a new directory. It refuses to write into a non-empty directory and does not install dependencies.
 
-套件發佈後可使用以下指令。
+After the package is published, you will be able to run:
 
 ```sh
 pnpm dlx immerslides create my-presentation
@@ -53,20 +76,20 @@ pnpm install
 pnpm dev
 ```
 
-## 使用對應的 skill
+## Use with an AI agent
 
-新專案會自動包含 `.agents/skills/immerslides/`。在該專案開啟支援 project skills 的 agent，使用以下提示。
+New projects include the skill at `.agents/skills/immerslides/`. In an agent that supports project skills, invoke it with a prompt such as:
 
 ```text
-$immerslides 請把這份教材整理成一份 CI 技術簡報。
-一次點擊切換一個完整頁面，流程不要逐節點拆開。
+$immerslides Turn this material into a CI talk.
+One click should advance one full slide. Do not split a flow into one click per node.
 ```
 
-維護用的唯一來源是 [skills/immerslides/SKILL.md](skills/immerslides/SKILL.md)。CLI 將它與其參考文件一起複製到新專案。既有專案也可將整個 `skills/immerslides` 資料夾複製至該專案的 `.agents/skills/immerslides`。
+The skill's source is [`skills/immerslides/SKILL.md`](skills/immerslides/SKILL.md), with reference documents in [`skills/immerslides/references/`](skills/immerslides/references/). To add the skill to an existing project, copy the whole `skills/immerslides` folder to `.agents/skills/immerslides` in that project.
 
-Skill 會先安排每頁的完整觀點，再使用套件元件撰寫 JSX。它保留整頁為主的點擊節奏，並要求檢查實際瀏覽器畫面、縮放與鍵盤播放。
+## Use in a React project
 
-## 在 React 專案使用
+Import the player and the styles once, then pass a deck to `Player`:
 
 ```tsx
 import { Player } from 'immerslides/player';
@@ -78,84 +101,126 @@ export function App() {
 }
 ```
 
-使用 `defineDeck` 定義頁面順序、章節與 renderer。每頁設定 `steps: 1` 即為一次前進換頁。需要少量分段時再明確增加 `steps`。
-
-每個元件都有獨立入口，可只匯入需要的部分。
+Define the deck with `defineDeck`. It sets the slide order, chapters, and a `RenderSlide` component:
 
 ```tsx
-import { CodeWindow } from 'immerslides/code-window';
-import { HighlightedCode } from 'immerslides/highlighted-code';
-import { FlowNode } from 'immerslides/flow-node';
-import type { CodeWindowProps } from 'immerslides/code-window';
+import { defineDeck, SlideFrame, type SlideRenderProps } from 'immerslides';
+
+function RenderSlide(props: SlideRenderProps) {
+  return (
+    <SlideFrame {...props} deck={deck} footer="Team talk">
+      <h1>Every commit gets feedback</h1>
+    </SlideFrame>
+  );
+}
+
+export const deck = defineDeck({
+  id: 'ci-presentation',
+  title: 'CI presentation',
+  version: 1,
+  size: { width: 1600, height: 900 },
+  slides: [
+    { id: 'opening', title: 'Every commit gets feedback', steps: 1 },
+    { id: 'pipeline', title: 'Read the pipeline at a glance', steps: 1 },
+  ],
+  previews: [{ slideId: 'opening' }],
+  RenderSlide,
+});
 ```
 
-`CodeWindow`、`FlowNode` 等基礎元件可直接使用，不需要播放器。單獨匯入外框不會載入語法上色或播放核心。既有的 `import { CodeWindow } from 'immerslides'` 也可繼續使用。完整入口見 [元件組合指南](skills/immerslides/references/composition.md)。樣式統一由 `immerslides/styles.css` 匯入。
+Use `steps: 1` for a normal slide, which advances with one click. Set a larger `steps` value only when a slide needs focus states. `steps` counts the initial state, so `steps: 2` gives the values `0` and `1`.
 
-完整範例與公開介面見 [製作指南](skills/immerslides/references/authoring.md)。支援範圍與使用時機見 [功能表](skills/immerslides/references/features.md)。
+Each component has its own entry point, so you can import only what you need:
 
-程式碼與流程的分段聚焦範例見 [沉浸式講解](skills/immerslides/references/immersive.md)。CodeBlock 支援 `language` 指定語法，例如 TypeScript、Python、Java、SQL、JSON、YAML、Bash、HTML 與 CSS。
+| Import | Provides |
+| --- | --- |
+| `immerslides` | Everything below, plus `usePlayback` and `useReducedMotion` |
+| `immerslides/player` | `Player` |
+| `immerslides/deck` | `defineDeck` and the deck types |
+| `immerslides/site` | `Site`, `SiteStory`, `getSiteHref` |
+| `immerslides/slide-frame`, `immerslides/chapter-guide` | `SlideFrame`, `ChapterGuide` |
+| `immerslides/slide-navigator`, `immerslides/slide-preview` | `SlideNavigator`, `SlidePreview` |
+| `immerslides/code-block`, `immerslides/code-window`, `immerslides/highlighted-code` | `CodeBlock`, `CodeWindow`, `HighlightedCode` |
+| `immerslides/timeline`, `immerslides/flow-node`, `immerslides/flow-connector` | `Timeline`, `FlowNode`, `FlowConnector` |
+| `immerslides/step-description` | `StepDescription` |
+| `immerslides/styles.css` | Global styles. Import once. |
 
-需要自己安排版面時，使用 [自由組合元件](skills/immerslides/references/composition.md)。`CodeWindow`、`HighlightedCode`、`StepDescription`、`FlowNode` 與 `FlowConnector` 可分開使用，並共用同一份講解步驟。
+Standalone components such as `CodeWindow` and `FlowNode` work without the player. For full guides, see:
 
-按 `P` 開啟 [簡報者模式](skills/immerslides/references/presenter.md)，查看目前畫面、下一個畫面、講稿與計時。講稿使用每頁可選的 `notes` 欄位。
+- [Authoring guide](skills/immerslides/references/authoring.md): deck definitions and the public API
+- [Features](skills/immerslides/references/features.md): what each feature is for
+- [Immersive walkthroughs](skills/immerslides/references/immersive.md): step-by-step code and flow focus
+- [Composition](skills/immerslides/references/composition.md): custom layouts with the standalone components
+- [Presenter mode](skills/immerslides/references/presenter.md): notes, next-slide preview, and timer
+- [Slide URLs](skills/immerslides/references/urls.md): slugs, hash URLs, and `getSlideHref`
+- [Site view](skills/immerslides/references/site.md): publishing the deck as a reading page
 
-每頁都有 [可分享的 slug 網址](skills/immerslides/references/urls.md)，例如 `/#/code-walkthrough?step=2`。網址會隨換頁與分段更新，支援重新整理與瀏覽器上一頁、下一頁。Slug 可明確指定，也會從標題與章節大綱產生。
+The reference documents are currently written in Chinese.
 
-也可使用 `/#/15` 直接前往第 15 頁。放映時直接鍵入頁數，或編輯下方目前頁數，再按 Enter 跳頁。Esc 或離開輸入框取消。純數字網址代表頁數，自訂 slug 使用 `chapter-1` 等名稱。
+## Playback controls
 
-按 `O` 開啟「章節與投影片」。文字大綱以章節與投影片的樹狀結構呈現，可展開或收合；未分章頁面直接列出。切到「縮圖預覽」可依畫面挑選頁面。選擇的模式會保留，關閉選單或重新整理後仍可沿用。目前頁面符合篩選時，開啟選單或切換模式會捲到該頁並標示選取狀態；選取其他頁面後同步更新網址。
+| Key | Action |
+| --- | --- |
+| → or Space | Next step. By default, this advances to the next slide. |
+| ← | Previous slide, or the previous explicitly defined step. |
+| Page Down / Page Up | Jump to the next or previous full slide. |
+| Digits, then Enter | Jump to a slide number. Esc cancels. |
+| `O` | Open the chapter and slide navigator. |
+| `F` | Toggle fullscreen. |
+| `P` | Open or focus the presenter window. |
+| `?` | Open the help dialog. |
+| Esc | Close menus. |
 
-範例工具列的 ☆ 可標記目前頁面。點旁邊的數量會開啟同一個「章節與投影片」視窗，並套用「已標記」篩選。文字大綱與縮圖都可篩選，保留原始頁碼並隱藏空章節。滑鼠移到頁面時，右上角會顯示星星，可標記或取消；點頁面本身即可查看。鍵盤聚焦也會顯示星星，觸控裝置則直接顯示。標記保留於本次播放，重新整理或從頭開始會清除。
+Reloading restores the slide and step from the URL. If the URL does not name a slide, the player restores the progress saved in the same tab. Pass `fresh` to `Player` (`<Player deck={deck} fresh />`) to start from the beginning instead.
 
-## 播放操作
+## Deploy
 
-| 按鍵               | 功能                               |
-| ------------------ | ---------------------------------- |
-| →／Space           | 前進。預設切換下一頁。             |
-| ←                  | 返回上一頁或上一個明確設定的步驟。 |
-| Page Down／Page Up | 直接切換整頁。                     |
-| 數字，再按 Enter   | 輸入頁數跳頁。Esc 取消。           |
-| O                  | 開啟章節與頁面選單。               |
-| F                  | 切換全螢幕。                       |
-| P                  | 開啟或聚焦簡報者視窗。             |
-| ?                  | 開啟說明與從頭開始。               |
-| Esc                | 關閉選單。                         |
+The production build is a static site with a page for the player (`/`, `/slides/`) and the reading view (`/site/`). Deploy the entire build output directory to any static host, and keep the subfolders intact.
 
-重新整理會優先恢復網址指定的投影片與步驟。未指定網址時沿用同一分頁保存的進度，`<Player deck={deck} fresh/>` 則從封面開始。使用者啟用減少動態效果時，播放器停用轉場並保留完整內容。
+## Development
 
-## 驗證
+Run these commands from the repository root:
 
-```sh
-pnpm lint
-pnpm test
-pnpm typecheck
-pnpm build
-pnpm test:package
-pnpm test:browser
-```
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Run the demo deck |
+| `pnpm build` | Build the library into `dist/` |
+| `pnpm typecheck` | Run the TypeScript compiler without emitting files |
+| `pnpm lint` | Run Biome checks for code, React rules, formatting, and import order |
+| `pnpm lint:fix` | Apply the Biome fixes that are safe to apply automatically |
+| `pnpm test` | Run unit tests with Vitest |
+| `pnpm test:browser` | Run end-to-end tests with Playwright |
+| `pnpm test:package` | Build the package and verify the installed result |
+| `pnpm generate:favicon` | Regenerate the favicon |
 
-`pnpm lint` 使用 Biome 檢查程式碼、React 規則、排版與匯入順序。`pnpm lint:fix` 套用可安全自動修正的項目。
+Browser tests need a Chromium build for Playwright. Install it once with `pnpm exec playwright install --with-deps chromium`.
 
-規則保留明確的 effect 生命週期觸發、非空斷言、動畫索引與既有 CSS 優先序，仍會阻擋遺漏的 effect 依賴。原生 dialog 取消、子控制項冒泡的焦點、按鈕群組與 React 測試 fixture 採檔案範圍的規則例外。產生的 favicon 不納入檢查。
+Project layout:
 
-## GitHub 自動化
+- `src/`: the library source (components, player, presenter, and site view)
+- `bin/`: the `immerslides` CLI, which provides `create`
+- `starter/`: the project template that the CLI copies, and the demo app for `pnpm dev`
+- `skills/immerslides/`: the agent skill and its reference documents
+- `tests/`: Vitest unit tests and Playwright browser tests
+- `scripts/`: build, package smoke test, and favicon generation
 
-Pull request 與推送至 `main` 會執行 lint、型別、單元、套件安裝與 Chromium 播放檢查。CI 與發佈前檢查共用 `.github/workflows/verify.yml`。
+## Continuous integration
 
-Dependabot 每週檢查主專案、starter 與 GitHub Actions 的依賴。CodeQL 在 pull request 與 `main` 更新時分析 JavaScript 與 TypeScript。私人 repository 需先啟用 GitHub Code Security，才能使用 CodeQL。
+Pull requests and pushes to `main` run [`verify.yml`](.github/workflows/verify.yml). It runs lint, type checks, unit tests, package verification, and the Chromium browser tests. CodeQL analyzes JavaScript and TypeScript. For private repositories, GitHub Code Security must be enabled first. Dependabot checks the root project, the starter, and GitHub Actions every week.
 
-## 發佈套件
+## Releasing
 
-發佈使用 [Release GitHub & NPM](https://github.com/marketplace/actions/release-github-npm)。流程僅能從 `main` 手動啟動，先執行共用檢查，再依序發佈 npm、GitHub Packages 與 GitHub Release。
+The **Release** workflow is started manually from `main`. It runs the shared verification, publishes to npm and GitHub Packages, and creates a GitHub Release.
 
-npm 名稱維持 `immerslides`。GitHub Packages 名稱為 `@<repository-owner>/immerslides`，scope 自動使用 repository 擁有者的小寫名稱。兩個 registry 使用同一份建置內容。Workflow 在 runner 暫時切換套件名稱與 repository 資訊；GitHub Packages 步驟結束後，無論成功與否都還原原始 manifest。
+Before the first release:
 
-1. 在 GitHub repository 建立 `npm` environment，限制僅允許 `main` 部署；需要人工核准時設定 required reviewers。
-2. 在該 environment 新增 `NPM_TOKEN` secret，使用有權發佈 `immerslides` 的 npm token。
-3. 確認 repository 的 `GITHUB_TOKEN` 可寫入 GitHub Packages。Workflow 已為發佈工作設定 `packages: write`；組織仍須允許建立該 scope 的套件。
-4. 提交要發佈的 `package.json` 版本。首次發佈前先確認 npm 套件名稱與授權。
-5. 開啟 Actions 的 **Release** workflow，選擇 `main` 並執行。
+1. Create an `npm` environment in the GitHub repository that allows deployments only from `main`. Add required reviewers if you want a manual approval step.
+2. Add an `NPM_TOKEN` secret to that environment. The token must be allowed to publish `immerslides`.
+3. Make sure the repository's `GITHUB_TOKEN` can write packages, and that the organization allows packages under the scope.
+4. Commit the version you want to release in `package.json`. The release creates the tag `v<version>`.
 
-版本取自 `package.json`，對應標籤為 `v<version>`。同名標籤若已指向其他 commit，流程會停止。已存在的 registry 版本沿用 Action 的略過機制。GitHub Release 包含 commit notes，穩定版會將 `v<major>` 標籤移到本次發佈的 commit。
+On GitHub Packages, the package is published as `@<repository-owner>/immerslides`. The scope uses the lowercase name of the repository owner. Both registries receive the same build.
 
-從 GitHub Packages 使用套件時，先設定該 scope 的 registry 與具備 `read:packages` 的登入權限。CLI 產生的專案會透過 npm alias 將 scoped 套件對應為 `immerslides`，原有元件匯入方式保持相同。產生專案後，該專案也需要相同的 scope registry 設定。
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
