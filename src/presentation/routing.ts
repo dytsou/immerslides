@@ -14,7 +14,7 @@ const normalizeSlug = (value: string) =>
     .normalize('NFKC')
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\p{M}]+/gu, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/^-|-$/g, '');
 
 export function createSlideRoutes(input: RouteDeck): SlideRoutes {
   // Slugs come from the authored titles, so every language shares the same links.
