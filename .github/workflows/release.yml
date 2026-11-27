@@ -1,6 +1,9 @@
 name: Release
 
 on:
+  push:
+    branches: [main]
+    paths: [package.json]
   workflow_dispatch:
 
 permissions:
@@ -11,14 +14,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  verify:
+  plan:
+    name: Check for a package version change
     if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.check.outputs.release }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+      - name: Compare the package version with the previous push
+        id: check
+        uses: dytsou/release/version-check@74e93b8e51ecbecc233e39e03fc1c91c1300a68e # v1.4.0
+        with:
+          before: ${{ github.event.before }}
+
+  verify:
+    needs: plan
+    if: needs.plan.outputs.release == 'true'
     uses: ./.github/workflows/verify.yml
 
   publish:
     name: Publish packages and GitHub release
-    if: github.ref == 'refs/heads/main'
-    needs: verify
+    needs: [plan, verify]
+    if: needs.plan.outputs.release == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: npm
@@ -50,12 +70,13 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm build
       - name: Publish npm package
-        uses: dytsou/release/npm-publish@291dd276baf77a9770947c5b4149e6fc866b8120 # v1
+        uses: dytsou/release/npm-publish@74e93b8e51ecbecc233e39e03fc1c91c1300a68e # v1.4.0
         with:
           npm-token: ${{ secrets.NPM_TOKEN }}
           node-version: ${{ steps.release.outputs.node-version }}
           install-deps: "false"
           verify-pack: "false"
+          dist-tag: auto
       - name: Select GitHub Packages metadata
         shell: bash
         run: |
@@ -63,17 +84,18 @@ jobs:
           npm pkg set "name=@${owner}/immerslides" "repository.type=git" "repository.url=git+${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
           npm pkg delete scripts.prepack
       - name: Publish GitHub Packages package
-        uses: dytsou/release/github-packages@291dd276baf77a9770947c5b4149e6fc866b8120 # v1
+        uses: dytsou/release/github-packages@74e93b8e51ecbecc233e39e03fc1c91c1300a68e # v1.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           node-version: ${{ steps.release.outputs.node-version }}
           install-deps: "false"
           verify-pack: "false"
+          dist-tag: auto
       - name: Restore npm metadata
         if: always()
         run: git restore -- package.json
       - name: Create GitHub release
-        uses: dytsou/release/github@291dd276baf77a9770947c5b4149e6fc866b8120 # v1
+        uses: dytsou/release/github@74e93b8e51ecbecc233e39e03fc1c91c1300a68e # v1.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           from-package-json: "true"
