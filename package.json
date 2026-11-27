@@ -1,6 +1,6 @@
 {
   "name": "immerslides",
-  "version": "1.0.0-beta-5",
+  "version": "1.0.0-beta-6",
   "description": "React presentations with immersive code and flow walkthroughs.",
   "license": "MIT",
   "repository": {
@@ -94,6 +94,7 @@
     "starter/vite.config.ts",
     "skills",
     "README.md",
+    "README.zh-TW.md",
     "LICENSE"
   ],
   "sideEffects": [
