@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { I18nProvider, useI18n } from '../i18n/context.js';
+import type { Locale } from '../i18n/messages.js';
 import { PlaybackProvider, usePlayback } from './context.js';
 import { getNavigationAction } from './keyboard.js';
 import { Modal } from './Modal.js';
@@ -17,28 +19,34 @@ export function Player({
   deck,
   fresh = false,
   homeHref,
+  locale,
 }: {
   deck: DeckDefinition;
   fresh?: boolean;
   homeHref?: string;
+  /** Interface language. Defaults to the nearest provider, then `zh-Hant`. */
+  locale?: Locale;
 }) {
   const Provider = deck.Provider;
   return (
-    <PlaybackProvider key={deck.id} deck={deck} fresh={fresh}>
-      {Provider ? (
-        <Provider fresh={fresh}>
+    <I18nProvider locale={locale}>
+      <PlaybackProvider key={deck.id} deck={deck} fresh={fresh}>
+        {Provider ? (
+          <Provider fresh={fresh}>
+            <PlayerView homeHref={homeHref} />
+          </Provider>
+        ) : (
           <PlayerView homeHref={homeHref} />
-        </Provider>
-      ) : (
-        <PlayerView homeHref={homeHref} />
-      )}
-    </PlaybackProvider>
+        )}
+      </PlaybackProvider>
+    </I18nProvider>
   );
 }
 
 function PlayerView({ homeHref }: { homeHref?: string }) {
   const player = useRef<HTMLDivElement>(null);
   const runtime = usePlayback();
+  const { t } = useI18n();
   const { deck, slide, actions } = runtime;
   const Navigator = deck.Navigator ?? SlideNavigator;
   const [menu, setMenu] = useState(false);
@@ -76,9 +84,9 @@ function PlayerView({ homeHref }: { homeHref?: string }) {
       if (document.fullscreenElement) await document.exitFullscreen();
       else await player.current!.requestFullscreen();
     } catch {
-      setFeedback('無法進入全螢幕，請使用瀏覽器的全螢幕功能。');
+      setFeedback(t('feedback.fullscreen'));
     }
-  }, []);
+  }, [t]);
   useEffect(() => {
     try {
       localStorage.setItem('immerslides:navigator:view', menuView);
@@ -182,7 +190,7 @@ function PlayerView({ homeHref }: { homeHref?: string }) {
           <button
             type="button"
             className="player-feedback"
-            aria-label="關閉提示"
+            aria-label={t('feedback.dismiss')}
             onClick={() => setFeedback('')}
           >
             <span role="status">{feedback}</span>
@@ -190,7 +198,7 @@ function PlayerView({ homeHref }: { homeHref?: string }) {
         )}
         {menu && (
           <Modal
-            title="章節與投影片"
+            title={t('navigator.title')}
             className="slide-navigator-modal"
             onClose={closeMenu}
           >
@@ -209,7 +217,7 @@ function PlayerView({ homeHref }: { homeHref?: string }) {
           </Modal>
         )}
         {help && (
-          <Modal title="放映操作" onClose={closeHelp}>
+          <Modal title={t('help.title')} onClose={closeHelp}>
             <PlayerHelp
               deck={deck}
               onRestart={() => {

@@ -7,6 +7,8 @@ import {
   useReducer,
   useRef,
 } from 'react';
+import { useI18n } from '../i18n/context.js';
+import { localizeDeck } from '../i18n/deck.js';
 import { createSlideRoutes, parseSlideHash, slideHref } from './routing.js';
 import { progressKey, readProgress, reduce } from './state.js';
 import type {
@@ -27,6 +29,8 @@ export function PlaybackProvider({
   children: ReactNode;
 }) {
   const routes = useMemo(() => createSlideRoutes(deck), [deck]);
+  const { locale } = useI18n();
+  const localized = useMemo(() => localizeDeck(deck, locale), [deck, locale]);
   const navigation = useRef<{
     initialized: boolean;
     target: Pick<PlaybackRuntime['state'], 'slideId' | 'step'> | null;
@@ -87,8 +91,14 @@ export function PlaybackProvider({
   );
   const index = deck.slides.findIndex((slide) => slide.id === state.slideId);
   const runtime = useMemo(
-    () => ({ deck, state, slide: deck.slides[index], index, actions }),
-    [deck, state, index, actions],
+    () => ({
+      deck: localized,
+      state,
+      slide: localized.slides[index],
+      index,
+      actions,
+    }),
+    [localized, state, index, actions],
   );
   return <Context.Provider value={runtime}>{children}</Context.Provider>;
 }

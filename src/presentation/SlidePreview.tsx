@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { useI18n } from '../i18n/context.js';
 import { SiteContext } from '../site/context.js';
 import { inertActions } from './inertActions.js';
 import type { DeckDefinition, SlideId } from './types.js';
@@ -12,6 +13,7 @@ export type SlidePreviewProps = {
 /** Shares the slide renderer, never a playback store, provider, or timer. */
 export function SlidePreview({ deck, slideId, step }: SlidePreviewProps) {
   const slide = deck.slides.find((slide) => slide.id === slideId)!;
+  const { locale } = useI18n();
   const frame = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
   useLayoutEffect(() => {
@@ -48,6 +50,7 @@ export function SlidePreview({ deck, slideId, step }: SlidePreviewProps) {
             still
             active={false}
             reducedMotion
+            locale={locale}
             actions={inertActions}
           />
         </SiteContext.Provider>

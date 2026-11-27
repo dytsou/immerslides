@@ -1,6 +1,7 @@
 import { ArrowLeft, ArrowRight, Pause, Play, RotateCcw, X } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useI18n } from '../i18n/context.js';
 import { usePlayback } from './context.js';
 import { getNavigationAction } from './keyboard.js';
 import { SlidePreview } from './SlidePreview.js';
@@ -11,6 +12,7 @@ type TimerState = { startedAt: number | null; elapsed: number };
 
 export function usePresenter(onFeedback: (message: string) => void) {
   const { deck } = usePlayback();
+  const { locale, t } = useI18n();
   const owned = useRef<PresenterWindow | null>(null);
   const [presenter, setPresenter] = useState<PresenterWindow | null>(null);
   const open = useCallback(() => {
@@ -20,12 +22,12 @@ export function usePresenter(onFeedback: (message: string) => void) {
     }
     const popup = window.open('', '_blank', 'popup,width=1360,height=900');
     if (!popup) {
-      onFeedback('無法開啟簡報者模式，請允許此網站的彈出式視窗後再試一次。');
+      onFeedback(t('presenter.popupBlocked'));
       return;
     }
     const doc = popup.document;
-    doc.title = `${deck.title} · 簡報者模式 · immerslides`;
-    doc.documentElement.lang = document.documentElement.lang || 'zh-Hant';
+    doc.title = t('presenter.title', { deck: deck.title });
+    doc.documentElement.lang = locale;
     const base = doc.createElement('base');
     base.href = document.baseURI;
     doc.head.append(base);
@@ -48,7 +50,7 @@ export function usePresenter(onFeedback: (message: string) => void) {
     setPresenter(next);
     onFeedback('');
     popup.focus();
-  }, [deck.title, onFeedback]);
+  }, [deck.title, locale, onFeedback, t]);
 
   useEffect(
     () => () => {
@@ -92,6 +94,7 @@ export function usePresenter(onFeedback: (message: string) => void) {
 
 function PresenterConsole({ popup }: { popup: Window }) {
   const { deck, slide, state, index, actions } = usePlayback();
+  const { t } = useI18n();
   const [timer, setTimer] = useState<TimerState>(() => ({
     startedAt: Date.now(),
     elapsed: 0,
@@ -168,23 +171,37 @@ function PresenterConsole({ popup }: { popup: Window }) {
     <>
       <header className="presenter-header">
         <div className="presenter-heading">
-          <span className="presenter-eyebrow">immerslides · 簡報者模式</span>
+          <span className="presenter-eyebrow">{t('presenter.eyebrow')}</span>
           <h1>{deck.title}</h1>
         </div>
         <div className="presenter-clock">
           <div>
             <span className="presenter-eyebrow">
-              {timer.startedAt === null ? '已暫停' : '已用時間'}
+              {timer.startedAt === null
+                ? t('presenter.paused')
+                : t('presenter.elapsed')}
             </span>
-            <output role="timer" aria-label="已用時間" aria-live="off">
+            <output
+              role="timer"
+              aria-label={t('presenter.elapsed')}
+              aria-live="off"
+            >
               {time}
             </output>
           </div>
           <button
             type="button"
             className="presenter-button presenter-icon"
-            aria-label={timer.startedAt === null ? '繼續計時' : '暫停計時'}
-            title={timer.startedAt === null ? '繼續計時' : '暫停計時'}
+            aria-label={
+              timer.startedAt === null
+                ? t('presenter.resumeTimer')
+                : t('presenter.pauseTimer')
+            }
+            title={
+              timer.startedAt === null
+                ? t('presenter.resumeTimer')
+                : t('presenter.pauseTimer')
+            }
             onClick={toggleTimer}
           >
             {timer.startedAt === null ? (
@@ -196,8 +213,8 @@ function PresenterConsole({ popup }: { popup: Window }) {
           <button
             type="button"
             className="presenter-button presenter-icon"
-            aria-label="重設計時"
-            title="重設計時"
+            aria-label={t('presenter.resetTimer')}
+            title={t('presenter.resetTimer')}
             onClick={resetTimer}
           >
             <RotateCcw size={18} />
@@ -206,8 +223,8 @@ function PresenterConsole({ popup }: { popup: Window }) {
         <button
           type="button"
           className="presenter-button presenter-icon"
-          aria-label="關閉簡報者模式"
-          title="關閉簡報者模式"
+          aria-label={t('presenter.close')}
+          title={t('presenter.close')}
           onClick={() => popup.close()}
         >
           <X size={21} />
@@ -216,13 +233,17 @@ function PresenterConsole({ popup }: { popup: Window }) {
       <main className="presenter-grid">
         <section
           className="presenter-panel presenter-current"
-          aria-label="目前投影片"
+          aria-label={t('presenter.current')}
         >
           <div className="presenter-panel-heading">
-            <h2>目前投影片</h2>
+            <h2>{t('presenter.current')}</h2>
             <span>
-              第 {index + 1} / {deck.slides.length} 頁 · 步驟 {state.step + 1} /{' '}
-              {slide.steps}
+              {t('presenter.currentPosition', {
+                page: index + 1,
+                total: deck.slides.length,
+                step: state.step + 1,
+                steps: slide.steps,
+              })}
             </span>
           </div>
           <SlidePreview deck={deck} slideId={slide.id} step={state.step} />
@@ -230,20 +251,24 @@ function PresenterConsole({ popup }: { popup: Window }) {
         </section>
         <section
           className="presenter-panel presenter-next"
-          aria-label="下一個畫面"
+          aria-label={t('presenter.upNext')}
         >
           <div className="presenter-panel-heading">
-            <h2>下一個畫面</h2>
+            <h2>{t('presenter.upNext')}</h2>
             {!finished && (
               <span>
-                第 {nextIndex + 1} 頁 · 步驟 {next.step + 1} / {nextSlide.steps}
+                {t('presenter.nextPosition', {
+                  page: nextIndex + 1,
+                  step: next.step + 1,
+                  steps: nextSlide.steps,
+                })}
               </span>
             )}
           </div>
           {finished ? (
             <div className="presenter-end">
-              <strong>已到最後一頁</strong>
-              <span>簡報結束，謝謝聆聽。</span>
+              <strong>{t('presenter.ended')}</strong>
+              <span>{t('presenter.endedCopy')}</span>
             </div>
           ) : (
             <>
@@ -258,16 +283,16 @@ function PresenterConsole({ popup }: { popup: Window }) {
         </section>
         <section
           className="presenter-panel presenter-notes"
-          aria-label="簡報者備註"
+          aria-label={t('presenter.notes')}
         >
           <div className="presenter-panel-heading">
-            <h2>簡報者備註</h2>
+            <h2>{t('presenter.notes')}</h2>
           </div>
-          <p>{slide.notes || '此頁沒有備註。'}</p>
+          <p>{slide.notes || t('presenter.noNotes')}</p>
         </section>
       </main>
       <footer className="presenter-navigation">
-        <span>觀眾畫面持續在原視窗放映</span>
+        <span>{t('presenter.audienceNote')}</span>
         <div className="presenter-navigation-actions">
           <button
             type="button"
@@ -276,11 +301,11 @@ function PresenterConsole({ popup }: { popup: Window }) {
             disabled={index === 0 && state.step === 0}
           >
             <ArrowLeft size={19} />
-            上一步
+            {t('presenter.previousStep')}
           </button>
           <output
             className="presenter-page-count"
-            aria-label="目前頁碼"
+            aria-label={t('presenter.pageNumber')}
             aria-live="off"
           >
             {index + 1} / {deck.slides.length}
@@ -291,7 +316,7 @@ function PresenterConsole({ popup }: { popup: Window }) {
             onClick={actions.next}
             disabled={finished}
           >
-            下一步
+            {t('presenter.nextStep')}
             <ArrowRight size={19} />
           </button>
         </div>

@@ -8,6 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
+import { I18nProvider, useI18n } from '../i18n/context.js';
+import { localizeDeck } from '../i18n/deck.js';
+import type { Locale } from '../i18n/messages.js';
 import { createSlideRoutes, slideHref } from '../presentation/routing.js';
 import type {
   DeckDefinition,
@@ -28,6 +31,8 @@ export type SiteProps = {
   deck: DeckDefinition;
   /** Presentation entry that receives the current `#/slug?step=` fragment. */
   presentationHref?: string;
+  /** Interface and content language. Defaults to the nearest provider, then `zh-Hant`. */
+  locale?: Locale;
 };
 
 type Viewport = { width: number; height: number };
@@ -48,13 +53,23 @@ const withHash = (hash: string) => {
   return url;
 };
 
-export function Site(props: SiteProps) {
-  return <SiteView key={props.deck.id} {...props} />;
+export function Site({ locale, ...props }: SiteProps) {
+  return (
+    <I18nProvider locale={locale}>
+      <SiteView key={props.deck.id} {...props} />
+    </I18nProvider>
+  );
 }
 
-function SiteView({ deck, presentationHref }: SiteProps) {
+function SiteView({
+  deck: source,
+  presentationHref,
+}: Omit<SiteProps, 'locale'>) {
   const reduced = useReducedMotion();
-  const routes = useMemo(() => createSlideRoutes(deck), [deck]);
+  const { locale, t } = useI18n();
+  // Links come from the source deck so they stay the same in every language.
+  const deck = useMemo(() => localizeDeck(source, locale), [source, locale]);
+  const routes = useMemo(() => createSlideRoutes(source), [source]);
   const probe = useRef<HTMLDivElement>(null);
   const trackElement = useRef<HTMLDivElement>(null);
   const sections = useRef<(HTMLElement | null)[]>([]);
@@ -423,7 +438,7 @@ function SiteView({ deck, presentationHref }: SiteProps) {
             className="immersite-presentation"
             href={presentationHref + slideHref(routes, front.id, frontStep)}
           >
-            放映簡報
+            {t('site.present')}
           </a>
         )}
       </div>
@@ -455,6 +470,7 @@ const SitePage = memo(function SitePage({
   sections: RefObject<(HTMLElement | null)[]>;
 }) {
   const slide = deck.slides[index];
+  const { locale } = useI18n();
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
@@ -526,6 +542,7 @@ const SitePage = memo(function SitePage({
             active={view.active}
             still={!view.active || reduced}
             reducedMotion={reduced}
+            locale={locale}
             actions={actions}
           />
         </div>

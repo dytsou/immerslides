@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { type ReactNode, useLayoutEffect, useRef } from 'react';
+import { useI18n } from '../i18n/context.js';
 import { IconButton } from './IconButton.js';
 
 type ModalProps = {
@@ -15,6 +16,7 @@ export function Modal({
   onClose,
   className = '',
 }: ModalProps) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
   useLayoutEffect(() => {
     const dialog = ref.current!;
@@ -36,7 +38,7 @@ export function Modal({
     >
       <header>
         <h2>{title}</h2>
-        <IconButton label="關閉" onClick={onClose}>
+        <IconButton label={t('modal.close')} onClick={onClose}>
           <X size={23} />
         </IconButton>
       </header>

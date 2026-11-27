@@ -78,14 +78,14 @@ pnpm dev
 
 ## Use with an AI agent
 
-New projects include the skill at `.agents/skills/immerslides/`. In an agent that supports project skills, invoke it with a prompt such as:
+New projects include two skills under `.agents/skills/`: `immerslides` (Chinese) and `immerslides-en` (English). In an agent that supports project skills, invoke one of them with a prompt such as:
 
 ```text
-$immerslides Turn this material into a CI talk.
+$immerslides-en Turn this material into a CI talk.
 One click should advance one full slide. Do not split a flow into one click per node.
 ```
 
-The skill's source is [`skills/immerslides/SKILL.md`](skills/immerslides/SKILL.md), with reference documents in [`skills/immerslides/references/`](skills/immerslides/references/). To add the skill to an existing project, copy the whole `skills/immerslides` folder to `.agents/skills/immerslides` in that project.
+The sources are [`skills/immerslides/`](skills/immerslides/) (Chinese) and [`skills/immerslides-en/`](skills/immerslides-en/) (English). Each folder contains a `SKILL.md` and a `references/` directory. Keep the two versions in sync when you change one. To add a skill to an existing project, copy the matching folder to `.agents/skills/` in that project.
 
 ## Use in a React project
 
@@ -132,44 +132,56 @@ Use `steps: 1` for a normal slide, which advances with one click. Set a larger `
 
 Each component has its own entry point, so you can import only what you need:
 
-| Import | Provides |
-| --- | --- |
-| `immerslides` | Everything below, plus `usePlayback` and `useReducedMotion` |
-| `immerslides/player` | `Player` |
-| `immerslides/deck` | `defineDeck` and the deck types |
-| `immerslides/site` | `Site`, `SiteStory`, `getSiteHref` |
-| `immerslides/slide-frame`, `immerslides/chapter-guide` | `SlideFrame`, `ChapterGuide` |
-| `immerslides/slide-navigator`, `immerslides/slide-preview` | `SlideNavigator`, `SlidePreview` |
-| `immerslides/code-block`, `immerslides/code-window`, `immerslides/highlighted-code` | `CodeBlock`, `CodeWindow`, `HighlightedCode` |
-| `immerslides/timeline`, `immerslides/flow-node`, `immerslides/flow-connector` | `Timeline`, `FlowNode`, `FlowConnector` |
-| `immerslides/step-description` | `StepDescription` |
-| `immerslides/styles.css` | Global styles. Import once. |
+| Import                                                                              | Provides                                                    |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `immerslides`                                                                       | Everything below, plus `usePlayback` and `useReducedMotion` |
+| `immerslides/player`                                                                | `Player`                                                    |
+| `immerslides/deck`                                                                  | `defineDeck` and the deck types                             |
+| `immerslides/site`                                                                  | `Site`, `SiteStory`, `getSiteHref`                          |
+| `immerslides/slide-frame`, `immerslides/chapter-guide`                              | `SlideFrame`, `ChapterGuide`                                |
+| `immerslides/slide-navigator`, `immerslides/slide-preview`                          | `SlideNavigator`, `SlidePreview`                            |
+| `immerslides/code-block`, `immerslides/code-window`, `immerslides/highlighted-code` | `CodeBlock`, `CodeWindow`, `HighlightedCode`                |
+| `immerslides/timeline`, `immerslides/flow-node`, `immerslides/flow-connector`       | `Timeline`, `FlowNode`, `FlowConnector`                     |
+| `immerslides/step-description`                                                      | `StepDescription`                                           |
+| `immerslides/styles.css`                                                            | Global styles. Import once.                                 |
 
 Standalone components such as `CodeWindow` and `FlowNode` work without the player. For full guides, see:
 
-- [Authoring guide](skills/immerslides/references/authoring.md): deck definitions and the public API
-- [Features](skills/immerslides/references/features.md): what each feature is for
-- [Immersive walkthroughs](skills/immerslides/references/immersive.md): step-by-step code and flow focus
-- [Composition](skills/immerslides/references/composition.md): custom layouts with the standalone components
-- [Presenter mode](skills/immerslides/references/presenter.md): notes, next-slide preview, and timer
-- [Slide URLs](skills/immerslides/references/urls.md): slugs, hash URLs, and `getSlideHref`
-- [Site view](skills/immerslides/references/site.md): publishing the deck as a reading page
+- [Authoring guide](skills/immerslides-en/references/authoring.md): deck definitions and the public API
+- [Features](skills/immerslides-en/references/features.md): what each feature is for
+- [Immersive walkthroughs](skills/immerslides-en/references/immersive.md): step-by-step code and flow focus
+- [Composition](skills/immerslides-en/references/composition.md): custom layouts with the standalone components
+- [Presenter mode](skills/immerslides-en/references/presenter.md): notes, next-slide preview, and timer
+- [Slide URLs](skills/immerslides-en/references/urls.md): slugs, hash URLs, and `getSlideHref`
+- [Site view](skills/immerslides-en/references/site.md): publishing the deck as a reading page
 
-The reference documents are currently written in Chinese.
+The Chinese versions of these guides are in [`skills/immerslides/references/`](skills/immerslides/references/).
+
+## Localization
+
+The player, presenter view, navigator, and site support `zh-Hant` (the default) and `en`. Pass `locale` to `Player` or `Site`:
+
+```tsx
+export function App() {
+  return <Player deck={deck} locale="en" />;
+}
+```
+
+Translate slide titles, notes, chapter titles, and the handout with `translations` in `defineDeck`, keyed by locale. Text without a translation falls back to the authored text. Links are built from the authored titles, so they are the same in every language. Slide renderers receive `locale`, and `useI18n()` gives your own components the current `locale` and a translator `t` for the built-in interface text.
 
 ## Playback controls
 
-| Key | Action |
-| --- | --- |
-| → or Space | Next step. By default, this advances to the next slide. |
-| ← | Previous slide, or the previous explicitly defined step. |
-| Page Down / Page Up | Jump to the next or previous full slide. |
-| Digits, then Enter | Jump to a slide number. Esc cancels. |
-| `O` | Open the chapter and slide navigator. |
-| `F` | Toggle fullscreen. |
-| `P` | Open or focus the presenter window. |
-| `?` | Open the help dialog. |
-| Esc | Close menus. |
+| Key                 | Action                                                   |
+| ------------------- | -------------------------------------------------------- |
+| → or Space          | Next step. By default, this advances to the next slide.  |
+| ←                   | Previous slide, or the previous explicitly defined step. |
+| Page Down / Page Up | Jump to the next or previous full slide.                 |
+| Digits, then Enter  | Jump to a slide number. Esc cancels.                     |
+| `O`                 | Open the chapter and slide navigator.                    |
+| `F`                 | Toggle fullscreen.                                       |
+| `P`                 | Open or focus the presenter window.                      |
+| `?`                 | Open the help dialog.                                    |
+| Esc                 | Close menus.                                             |
 
 Reloading restores the slide and step from the URL. If the URL does not name a slide, the player restores the progress saved in the same tab. Pass `fresh` to `Player` (`<Player deck={deck} fresh />`) to start from the beginning instead.
 
@@ -181,17 +193,17 @@ The production build is a static site with a page for the player (`/`, `/slides/
 
 Run these commands from the repository root:
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Run the demo deck |
-| `pnpm build` | Build the library into `dist/` |
-| `pnpm typecheck` | Run the TypeScript compiler without emitting files |
-| `pnpm lint` | Run Biome checks for code, React rules, formatting, and import order |
-| `pnpm lint:fix` | Apply the Biome fixes that are safe to apply automatically |
-| `pnpm test` | Run unit tests with Vitest |
-| `pnpm test:browser` | Run end-to-end tests with Playwright |
-| `pnpm test:package` | Build the package and verify the installed result |
-| `pnpm generate:favicon` | Regenerate the favicon |
+| Command                 | Purpose                                                              |
+| ----------------------- | -------------------------------------------------------------------- |
+| `pnpm dev`              | Run the demo deck                                                    |
+| `pnpm build`            | Build the library into `dist/`                                       |
+| `pnpm typecheck`        | Run the TypeScript compiler without emitting files                   |
+| `pnpm lint`             | Run Biome checks for code, React rules, formatting, and import order |
+| `pnpm lint:fix`         | Apply the Biome fixes that are safe to apply automatically           |
+| `pnpm test`             | Run unit tests with Vitest                                           |
+| `pnpm test:browser`     | Run end-to-end tests with Playwright                                 |
+| `pnpm test:package`     | Build the package and verify the installed result                    |
+| `pnpm generate:favicon` | Regenerate the favicon                                               |
 
 Browser tests need a Chromium build for Playwright. Install it once with `pnpm exec playwright install --with-deps chromium`.
 

@@ -31,6 +31,18 @@ it('creates a standalone starter with the exact packaged project skill', () => {
       'utf8',
     ),
   ).toBe(readFileSync('skills/immerslides/SKILL.md', 'utf8'));
+  expect(
+    readFileSync(
+      path.join(target, '.agents/skills/immerslides-en/SKILL.md'),
+      'utf8',
+    ),
+  ).toBe(readFileSync('skills/immerslides-en/SKILL.md', 'utf8'));
+  expect(
+    readFileSync(
+      path.join(target, '.agents/skills/immerslides-en/references/urls.md'),
+      'utf8',
+    ),
+  ).toBe(readFileSync('skills/immerslides-en/references/urls.md', 'utf8'));
   expect(readFileSync(path.join(target, 'src/main.tsx'), 'utf8')).toContain(
     "from 'immerslides/player'",
   );

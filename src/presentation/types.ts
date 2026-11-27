@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
+import { isLocale, type Locale } from '../i18n/messages.js';
 import { createSlideRoutes } from './routing.js';
 
 export type SlideId = string | number;
@@ -35,6 +36,7 @@ export type SlideRenderProps = {
   still: boolean;
   active: boolean;
   reducedMotion: boolean;
+  locale: Locale;
   actions: PresentationActions;
 };
 /** Animate toward the renderer's authored final layout. Returned animations
@@ -86,6 +88,20 @@ export type StageOverlayProps = PlaybackRuntime & {
   viewport: { width: number; height: number };
   scale: number;
 };
+/**
+ * Localized text for one locale. Keys refer to existing IDs. Slugs and URLs are
+ * always derived from the deck's own titles, so translations never change links.
+ */
+export type DeckTranslation = {
+  title?: string;
+  description?: string;
+  /** Keyed by chapter ID. */
+  chapters?: Readonly<Record<string, string>>;
+  /** Keyed by slide ID, using `String(id)` for numeric IDs. */
+  slides?: Readonly<Record<string, { title?: string; notes?: string }>>;
+  handout?: { title?: string; href?: string };
+};
+
 export type DeckDefinition = {
   id: string;
   title: string;
@@ -102,6 +118,8 @@ export type DeckDefinition = {
     slug?: string;
   }[];
   handout?: { title: string; href: string };
+  /** Translations of the authored text. The source text is the fallback. */
+  translations?: Readonly<Partial<Record<Locale, DeckTranslation>>>;
   transition?: TransitionDefinition | false;
   /** Set for decks whose page poses should land immediately and animate only on manual steps. */
   freezeEntranceOnNavigation?: boolean;
@@ -170,6 +188,21 @@ export function defineDeck<T extends DeckDefinition>(deck: T): T {
       );
     chapterIds.add(chapter.id);
     previousChapter = index;
+  }
+  const slideKeys = new Set(deck.slides.map((slide) => String(slide.id)));
+  for (const [locale, translation] of Object.entries(deck.translations ?? {})) {
+    if (!isLocale(locale))
+      throw new Error(`Deck ${deck.id} has an unsupported locale: ${locale}.`);
+    for (const key of Object.keys(translation?.slides ?? {}))
+      if (!slideKeys.has(key))
+        throw new Error(
+          `Translation ${locale} in deck ${deck.id} names unknown slide ${key}.`,
+        );
+    for (const key of Object.keys(translation?.chapters ?? {}))
+      if (!chapterIds.has(key))
+        throw new Error(
+          `Translation ${locale} in deck ${deck.id} names unknown chapter ${key}.`,
+        );
   }
   createSlideRoutes(deck);
   return deck;

@@ -18,6 +18,10 @@ export type {
   TimelineStep,
 } from './flow/Timeline.js';
 export { Timeline } from './flow/Timeline.js';
+export type { Translator } from './i18n/context.js';
+export { I18nProvider, useI18n } from './i18n/context.js';
+export type { Locale } from './i18n/messages.js';
+export { defaultLocale, locales } from './i18n/messages.js';
 export { usePlayback } from './presentation/context.js';
 export { Player } from './presentation/Player.js';
 export { getSlideHref } from './presentation/routing.js';
@@ -27,6 +31,7 @@ export { SlidePreview } from './presentation/SlidePreview.js';
 export { fadeTransition } from './presentation/transitions.js';
 export type {
   DeckDefinition,
+  DeckTranslation,
   NavigatorFilter,
   NavigatorView,
   PlaybackRuntime,

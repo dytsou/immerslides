@@ -1,4 +1,5 @@
 import type { RefObject } from 'react';
+import { useI18n } from '../i18n/context.js';
 import type { DeckDefinition, PresentationActions } from './types.js';
 
 type PageNumberInputProps = {
@@ -14,6 +15,7 @@ export function PageNumberInput({
   onJump,
   inputRef,
 }: PageNumberInputProps) {
+  const { t } = useI18n();
   return (
     <form
       className="nav-position"
@@ -40,8 +42,8 @@ export function PageNumberInput({
         step={1}
         required
         defaultValue={String(index + 1).padStart(2, '0')}
-        aria-label="投影片頁數"
-        title={`輸入 1 到 ${deck.slides.length}，按 Enter 跳頁，Esc 取消`}
+        aria-label={t('page.label')}
+        title={t('page.hint', { total: deck.slides.length })}
         style={{ width: `${Math.max(2, String(deck.slides.length).length)}ch` }}
         onFocus={(event) => event.currentTarget.select()}
         onBlur={(event) => {

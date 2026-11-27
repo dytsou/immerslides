@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react';
+import { useI18n } from '../i18n/context.js';
+import { defaultLocale, messages } from '../i18n/messages.js';
 import { SlidePreview } from './SlidePreview.js';
 import type {
   DeckDefinition,
@@ -16,6 +18,7 @@ type SlideGroup = {
 export function groupSlides(
   deck: DeckDefinition,
   included?: ReadonlySet<SlideId>,
+  ungroupedTitle = messages[defaultLocale]['navigator.ungrouped'],
 ): SlideGroup[] {
   const groups: SlideGroup[] = [];
   let chapterIndex = 0;
@@ -25,7 +28,8 @@ export function groupSlides(
       groups.push({ id: chapter.id, title: chapter.title, slides: [] });
       chapterIndex++;
     }
-    if (!groups.length) groups.push({ id: null, title: '投影片', slides: [] });
+    if (!groups.length)
+      groups.push({ id: null, title: ungroupedTitle, slides: [] });
     if (!included || included.has(slide.id))
       groups.at(-1)!.slides.push({ slide, index });
   }
@@ -46,9 +50,11 @@ export function SlideNavigator({
   const selected = useRef<HTMLButtonElement>(null);
   const list = useRef<HTMLOListElement>(null);
   const markedFilter = useRef<HTMLButtonElement>(null);
+  const { t } = useI18n();
   const groups = groupSlides(
     deck,
     filter === 'marked' ? markedSlides : undefined,
+    t('navigator.ungrouped'),
   );
   useEffect(() => {
     const button = selected.current;
@@ -101,7 +107,14 @@ export function SlideNavigator({
               type="button"
               className="navigator-mark"
               aria-pressed={markedSlides.has(slide.id)}
-              aria-label={`${markedSlides.has(slide.id) ? '取消標記頁面' : '標記頁面'}：${slide.title}（第 ${index + 1} 頁）`}
+              aria-label={
+                markedSlides.has(slide.id)
+                  ? t('navigator.unmark', {
+                      title: slide.title,
+                      page: index + 1,
+                    })
+                  : t('navigator.mark', { title: slide.title, page: index + 1 })
+              }
               onClick={() => {
                 if (filter === 'marked') markedFilter.current?.focus();
                 onToggleMark(slide.id);
@@ -119,33 +132,41 @@ export function SlideNavigator({
       className="slide-navigator"
       data-view={view}
       data-filter={filter}
-      aria-label="投影片導覽"
+      aria-label={t('navigator.label')}
     >
       <div className="navigator-toolbar">
-        <div className="navigator-view" role="group" aria-label="顯示模式">
+        <div
+          className="navigator-view"
+          role="group"
+          aria-label={t('navigator.view')}
+        >
           <button
             type="button"
             aria-pressed={view === 'outline'}
             onClick={() => onViewChange('outline')}
           >
-            文字大綱
+            {t('navigator.outline')}
           </button>
           <button
             type="button"
             aria-pressed={view === 'thumbnails'}
             onClick={() => onViewChange('thumbnails')}
           >
-            縮圖預覽
+            {t('navigator.thumbnails')}
           </button>
         </div>
         {markedSlides && (
-          <div className="navigator-view" role="group" aria-label="頁面篩選">
+          <div
+            className="navigator-view"
+            role="group"
+            aria-label={t('navigator.filter')}
+          >
             <button
               type="button"
               aria-pressed={filter === 'all'}
               onClick={() => onFilterChange('all')}
             >
-              全部
+              {t('navigator.all')}
             </button>
             <button
               ref={markedFilter}
@@ -153,12 +174,16 @@ export function SlideNavigator({
               aria-pressed={filter === 'marked'}
               onClick={() => onFilterChange('marked')}
             >
-              已標記
+              {t('navigator.marked')}
             </button>
           </div>
         )}
       </div>
-      <ol ref={list} className="navigator-groups" aria-label="投影片與章節">
+      <ol
+        ref={list}
+        className="navigator-groups"
+        aria-label={t('navigator.list')}
+      >
         {groups.map((group) => (
           <li key={group.id === null ? 'unassigned' : `chapter:${group.id}`}>
             {group.id === null ? (
@@ -168,7 +193,7 @@ export function SlideNavigator({
                 <summary className="navigator-summary">
                   <span>{group.title}</span>
                   <span className="navigator-count">
-                    {group.slides.length} 頁
+                    {t('navigator.count', { count: group.slides.length })}
                   </span>
                 </summary>
                 {slides(group)}
@@ -179,7 +204,7 @@ export function SlideNavigator({
       </ol>
       {!groups.length && (
         <p role="status" className="navigator-empty">
-          還沒有標記頁面。
+          {t('navigator.empty')}
         </p>
       )}
     </nav>

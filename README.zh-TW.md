@@ -57,14 +57,14 @@ pnpm dev
 
 ## 使用對應的 skill
 
-新專案會自動包含 `.agents/skills/immerslides/`。在該專案開啟支援 project skills 的 agent，使用以下提示。
+新專案會自動包含兩個 skill：中文版 `.agents/skills/immerslides/` 與英文版 `.agents/skills/immerslides-en/`。在該專案開啟支援 project skills 的 agent，選擇其中一個，例如使用以下提示。
 
 ```text
 $immerslides 請把這份教材整理成一份 CI 技術簡報。
 一次點擊切換一個完整頁面，流程不要逐節點拆開。
 ```
 
-維護用的唯一來源是 [skills/immerslides/SKILL.md](skills/immerslides/SKILL.md)。CLI 將它與其參考文件一起複製到新專案。既有專案也可將整個 `skills/immerslides` 資料夾複製至該專案的 `.agents/skills/immerslides`。
+維護用的來源分別是 [skills/immerslides/](skills/immerslides/)（中文）與 [skills/immerslides-en/](skills/immerslides-en/)（英文），兩者都包含 `SKILL.md` 與 `references/`。修改其中一版時請同步另一版。CLI 會將兩者與各自的參考文件一起複製到新專案。既有專案也可將對應的資料夾複製至該專案的 `.agents/skills/`。
 
 Skill 會先安排每頁的完整觀點，再使用套件元件撰寫 JSX。它保留整頁為主的點擊節奏，並要求檢查實際瀏覽器畫面、縮放與鍵盤播放。
 
@@ -108,6 +108,12 @@ import type { CodeWindowProps } from 'immerslides/code-window';
 按 `O` 開啟「章節與投影片」。文字大綱以章節與投影片的樹狀結構呈現，可展開或收合；未分章頁面直接列出。切到「縮圖預覽」可依畫面挑選頁面。選擇的模式會保留，關閉選單或重新整理後仍可沿用。目前頁面符合篩選時，開啟選單或切換模式會捲到該頁並標示選取狀態；選取其他頁面後同步更新網址。
 
 範例工具列的 ☆ 可標記目前頁面。點旁邊的數量會開啟同一個「章節與投影片」視窗，並套用「已標記」篩選。文字大綱與縮圖都可篩選，保留原始頁碼並隱藏空章節。滑鼠移到頁面時，右上角會顯示星星，可標記或取消；點頁面本身即可查看。鍵盤聚焦也會顯示星星，觸控裝置則直接顯示。標記保留於本次播放，重新整理或從頭開始會清除。
+
+## 多語言
+
+播放器、簡報者模式、導覽與網站的介面支援 `zh-Hant`（預設）與 `en`。在 `Player` 或 `Site` 傳入 `locale` 即可切換。
+
+投影片標題、備註、章節與講義可在 `defineDeck` 的 `translations` 依語言翻譯，沒有翻譯的文字沿用原始內容。網址由原始標題產生，因此各語言的連結相同。詳見 [authoring.md](skills/immerslides/references/authoring.md)。
 
 ## 播放操作
 

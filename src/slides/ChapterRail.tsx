@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/context.js';
 import type {
   DeckDefinition,
   SlideDefinition,
@@ -21,10 +22,11 @@ export function ChapterRail({
   slide: SlideDefinition;
   onJump?: StageOverlayProps['actions']['jump'];
 }) {
+  const { t } = useI18n();
   const chapters = deck.chapters ?? [];
   const current = chapterPosition(deck, slide);
   return (
-    <nav className="immerslides-rail" aria-label="章節進度">
+    <nav className="immerslides-rail" aria-label={t('chapterRail.label')}>
       <div className="immerslides-rail-window">
         <ol style={{ transform: `translateY(${80 - current * 80}px)` }}>
           {chapters.map((chapter, index) => (

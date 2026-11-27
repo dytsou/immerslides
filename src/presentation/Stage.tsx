@@ -1,4 +1,5 @@
 import { type CSSProperties, useLayoutEffect, useRef, useState } from 'react';
+import { useI18n } from '../i18n/context.js';
 import { usePlayback } from './context.js';
 import { inertActions } from './inertActions.js';
 import {
@@ -30,6 +31,7 @@ function LiveSlide({
   actions: PresentationActions;
 }) {
   const reducedMotion = useReducedMotion();
+  const { locale } = useI18n();
   const [entrance, setEntrance] = useState({ step: point.step, frozen });
   if (entrance.frozen && entrance.step !== point.step)
     setEntrance({ step: point.step, frozen: false });
@@ -42,6 +44,7 @@ function LiveSlide({
       active={active}
       still={!active || entrance.frozen || reducedMotion}
       reducedMotion={reducedMotion}
+      locale={locale}
       actions={actions}
     />
   );

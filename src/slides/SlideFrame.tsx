@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { useI18n } from '../i18n/context.js';
+import { localizeDeck } from '../i18n/deck.js';
 import type {
   DeckDefinition,
   PresentationActions,
@@ -18,16 +20,19 @@ export type SlideFrameProps = {
 };
 
 export function SlideFrame({
-  deck,
+  deck: source,
   slide,
   layout = 'content',
-  footer = deck.title,
+  footer,
   still = false,
   mode = 'playback',
   actions,
   children,
 }: SlideFrameProps) {
+  const { locale } = useI18n();
+  const deck = localizeDeck(source, locale);
   const index = deck.slides.findIndex((item) => item.id === slide.id);
+  const title = deck.slides[index]?.title ?? slide.title;
   const chapters = deck.chapters ?? [];
   const chapterIndex = chapterPosition(deck, slide);
   const chapter = chapters[chapterIndex];
@@ -38,18 +43,18 @@ export function SlideFrame({
       data-still={still || undefined}
       data-mode={mode}
       data-slide={slide.id}
-      aria-label={slide.title}
+      aria-label={title}
     >
       {rail && <ChapterRail deck={deck} slide={slide} onJump={actions?.jump} />}
       {layout === 'content' && (
         <header className="immerslides-heading">
           <p>{chapter?.title ?? deck.title}</p>
-          <h1>{slide.title}</h1>
+          <h1>{title}</h1>
         </header>
       )}
       <div className="immerslides-body">{children}</div>
       <footer className="immerslides-footer">
-        <span>{footer}</span>
+        <span>{footer === undefined ? deck.title : footer}</span>
         <span>
           {index + 1} / {deck.slides.length}
         </span>

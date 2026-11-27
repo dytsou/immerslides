@@ -34,7 +34,7 @@ export function ReadingPage() {
 }
 ```
 
-presentationHref 指向宿主專案的簡報入口。部署在子目錄時，使用包含該子目錄的網址。Site 本身不註冊宿主路由。
+presentationHref 指向宿主專案的簡報入口。部署在子目錄時，使用包含該子目錄的網址。Site 本身不註冊宿主路由。`locale` 設定網站的介面與內容語言，詳見 [authoring.md](authoring.md) 的「多語言」。
 
 網站專屬的 CSS 類別使用 immersite 與 immersite-*。共用的內容元件仍沿用原有類別，樣式統一由 immerslides/styles.css 提供。
 

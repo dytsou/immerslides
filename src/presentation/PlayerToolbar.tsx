@@ -11,6 +11,7 @@ import {
   Monitor,
 } from 'lucide-react';
 import type { RefObject } from 'react';
+import { useI18n } from '../i18n/context.js';
 import { IconButton } from './IconButton.js';
 import { PageNumberInput } from './PageNumberInput.js';
 import type { NavigatorFilter, PlaybackRuntime } from './types.js';
@@ -45,6 +46,7 @@ export function PlayerToolbar({
   onOpenPresenter,
 }: PlayerToolbarProps) {
   const { deck, state, slide, index, actions } = runtime;
+  const { t } = useI18n();
   return (
     <div
       className={`presentation-controls projection-controls ${visible ? 'visible' : ''}`}
@@ -54,8 +56,8 @@ export function PlayerToolbar({
         <a
           href={homeHref}
           className="icon-button"
-          aria-label="返回首頁"
-          title="返回首頁"
+          aria-label={t('toolbar.home')}
+          title={t('toolbar.home')}
         >
           <Home size={20} />
         </a>
@@ -63,8 +65,8 @@ export function PlayerToolbar({
       <button
         type="button"
         className="icon-button"
-        aria-label="章節與頁面（O）"
-        title="章節與頁面（O）"
+        aria-label={t('toolbar.navigator')}
+        title={t('toolbar.navigator')}
         ref={menuButton}
         onClick={() => onOpenNavigator()}
       >
@@ -72,7 +74,7 @@ export function PlayerToolbar({
       </button>
       <div className="control-divider" />
       <IconButton
-        label="上一頁（Page Up）"
+        label={t('toolbar.previousSlide')}
         secondary
         onClick={actions.previousSlide}
         disabled={index === 0}
@@ -80,7 +82,7 @@ export function PlayerToolbar({
         <ChevronFirst size={20} />
       </IconButton>
       <IconButton
-        label="上一步（←）"
+        label={t('toolbar.previousStep')}
         onClick={actions.previous}
         disabled={index === 0 && state.step === 0}
       >
@@ -93,7 +95,7 @@ export function PlayerToolbar({
         inputRef={pageInput}
       />
       <IconButton
-        label="下一步（→ / Space）"
+        label={t('toolbar.nextStep')}
         onClick={actions.next}
         disabled={
           index === deck.slides.length - 1 && state.step === slide.steps - 1
@@ -102,7 +104,7 @@ export function PlayerToolbar({
         <ArrowRight size={22} />
       </IconButton>
       <IconButton
-        label="下一頁（Page Down）"
+        label={t('toolbar.nextSlide')}
         secondary
         onClick={actions.nextSlide}
         disabled={index === deck.slides.length - 1}
@@ -111,19 +113,21 @@ export function PlayerToolbar({
       </IconButton>
       <div className="control-divider" />
       <IconButton
-        label={fullscreen ? '離開全螢幕（F）' : '全螢幕（F）'}
+        label={
+          fullscreen ? t('toolbar.exitFullscreen') : t('toolbar.fullscreen')
+        }
         onClick={onToggleFullscreen}
       >
         {fullscreen ? <Minimize size={20} /> : <Maximize size={20} />}
       </IconButton>
-      <IconButton label="簡報者模式（P）" onClick={onOpenPresenter}>
+      <IconButton label={t('toolbar.presenter')} onClick={onOpenPresenter}>
         <Monitor size={20} />
       </IconButton>
       <button
         type="button"
         className="icon-button"
-        aria-label="操作說明（?）"
-        title="操作說明（?）"
+        aria-label={t('toolbar.help')}
+        title={t('toolbar.help')}
         ref={helpButton}
         onClick={onOpenHelp}
       >

@@ -1,3 +1,4 @@
+import { sourceDeck } from '../i18n/deck.js';
 import type { DeckDefinition, PlaybackState, SlideId } from './types.js';
 
 type SlideTarget = Pick<PlaybackState, 'slideId' | 'step'>;
@@ -15,7 +16,9 @@ const normalizeSlug = (value: string) =>
     .replace(/[^\p{L}\p{N}\p{M}]+/gu, '-')
     .replace(/^-+|-+$/g, '');
 
-export function createSlideRoutes(deck: RouteDeck): SlideRoutes {
+export function createSlideRoutes(input: RouteDeck): SlideRoutes {
+  // Slugs come from the authored titles, so every language shares the same links.
+  const deck = sourceDeck(input);
   const slides = new Map<SlideId, { slug: string; steps: number }>();
   const targets = new Map<string, SlideId>();
   const bases = deck.slides.map((slide) => {

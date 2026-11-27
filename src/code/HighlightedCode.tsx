@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { useI18n } from '../i18n/context.js';
 import { useReducedMotion } from '../presentation/useReducedMotion.js';
 import {
   type CodeLineRange,
@@ -27,6 +28,7 @@ export function HighlightedCode({
   if (focus) validateCodeRanges(focus, lines.length);
   const pre = useRef<HTMLPreElement>(null);
   const reducedMotion = useReducedMotion();
+  const { t } = useI18n();
   useEffect(() => {
     const element = pre.current;
     const first = element?.querySelector<HTMLElement>('[data-focused="true"]');
@@ -53,7 +55,7 @@ export function HighlightedCode({
       data-still={still || undefined}
       ref={pre}
       tabIndex={0}
-      aria-label="Code"
+      aria-label={t('code.label')}
     >
       <code>
         {focus?.map(([start, end], index) => (

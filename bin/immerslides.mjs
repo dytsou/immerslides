@@ -45,8 +45,9 @@ try {
       throw new Error(
         'The destination must be a new or empty directory. Existing files were not changed.',
       );
-    const skill = path.join(root, 'skills/immerslides');
-    await readFile(path.join(skill, 'SKILL.md'));
+    const skills = ['immerslides', 'immerslides-en'];
+    for (const name of skills)
+      await readFile(path.join(root, 'skills', name, 'SKILL.md'));
     await mkdir(destination, { recursive: true });
     const starter = path.join(root, 'starter');
     for (const entry of await readdir(starter)) {
@@ -58,11 +59,12 @@ try {
           !['node_modules', 'dist'].includes(path.basename(source)),
       });
     }
-    await cp(skill, path.join(destination, '.agents/skills/immerslides'), {
-      recursive: true,
-      force: false,
-      errorOnExist: true,
-    });
+    for (const name of skills)
+      await cp(
+        path.join(root, 'skills', name),
+        path.join(destination, '.agents/skills', name),
+        { recursive: true, force: false, errorOnExist: true },
+      );
     const projectPath = path.join(destination, 'package.json');
     const project = JSON.parse(await readFile(projectPath, 'utf8'));
     project.name =
@@ -82,7 +84,7 @@ try {
     );
     const shellDirectory = "'" + destination.replaceAll("'", "'\\''") + "'";
     console.log(
-      `Created ${destination}\n\nRun:\n  cd ${shellDirectory}\n  pnpm install\n  pnpm dev\n\nUse $immerslides to create or revise the presentation.`,
+      `Created ${destination}\n\nRun:\n  cd ${shellDirectory}\n  pnpm install\n  pnpm dev\n\nUse $immerslides (Chinese) or $immerslides-en (English) to create or revise the presentation.`,
     );
   }
 } catch (error) {

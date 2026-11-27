@@ -105,7 +105,7 @@ export const deck = defineDeck({
 
 每頁與章節可設定 `slug?: string`。使用 `getSlideHref(deck, id, step)` 建立可直接開啟的連結，詳見 [urls.md](urls.md)。
 
-自訂 `RenderSlide` 接收 `slide`、`step`、`mode`、`active`、`still`、`reducedMotion`、`actions`。使用 `actions.next()`、`previous()`、`nextSlide()`、`previousSlide()`、`jump(id)`、`restart()` 操作進度。
+自訂 `RenderSlide` 接收 `slide`、`step`、`mode`、`active`、`still`、`reducedMotion`、`locale`、`actions`。使用 `actions.next()`、`previous()`、`nextSlide()`、`previousSlide()`、`jump(id)`、`restart()` 操作進度。
 
 自訂轉場以 renderer 已渲染的最終版型為終點，回傳有限時間內完成的 Web Animations API `Animation` 或陣列。播放器會在完成或中斷時取消動畫，不保留動畫的 fill 效果。最終內容與位置必須由 JSX 和 CSS 決定。`capture` 只回傳可獨立保存的幾何與樣式資料，不保存 DOM nodes。
 
@@ -114,3 +114,30 @@ export const deck = defineDeck({
 以產生專案內實際的 `package.json` 為準。Starter 使用 pnpm、Vite、React 與 TypeScript，提供 `pnpm dev`、`pnpm typecheck`、`pnpm build`。`packageManager` 指定 pnpm 版本，`pnpm-lock.yaml` 固定解析後的依賴。
 
 新增頁面時同步更新 `slides` 與 `RenderSlide`。章節的 `slideId` 指向該章第一頁。`previews` 只列出需要靜態展示的頁面。
+
+## 多語言
+
+播放器、簡報者模式、導覽與網站的介面支援 `zh-Hant`（預設）與 `en`。在 `Player` 或 `Site` 傳入 `locale`，沒有指定時沿用外層的 `I18nProvider`，最後回到 `zh-Hant`。
+
+```tsx
+<Player deck={deck} locale="en" />
+<Site deck={deck} locale="en" presentationHref="/slides/" />
+```
+
+投影片標題、備註、章節與講義的翻譯放在 `defineDeck` 的 `translations`，以語言為鍵。`slides` 與 `chapters` 以 ID 對應，數字 ID 使用 `String(id)`。沒有翻譯的文字使用原始內容。
+
+```tsx
+export const deck = defineDeck({
+  // ...
+  translations: {
+    en: {
+      title: 'English talk',
+      slides: { intro: { title: 'Opening', notes: 'Opening notes' } },
+      chapters: { start: 'Start' },
+      handout: { title: 'Handout', href: '/handout-en.pdf' },
+    },
+  },
+});
+```
+
+網址與 slug 永遠由原始標題產生，切換語言不會改變連結。`RenderSlide` 會收到 `locale`，`SlideFrame` 與 `ChapterRail` 會自動套用翻譯。JSX 內的正文不會自動翻譯，需要依 `locale` 分支，或為每種語言寫一份 renderer。自訂元件可用 `useI18n()` 取得目前的 `locale`，並以 `t` 取用內建的介面文字。
