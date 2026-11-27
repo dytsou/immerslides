@@ -1,5 +1,5 @@
 {
-  "name": "my-immerslides",
+  "name": "immerslides-starter",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -13,7 +13,7 @@
     "preview": "vite preview --host 127.0.0.1"
   },
   "dependencies": {
-    "immerslides": "^1.0.0-beta-1",
+    "immerslides": "^1.0.0-beta-2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
