@@ -13,6 +13,9 @@ import path from 'node:path';
 import { expect, it } from 'vitest';
 
 const cli = path.resolve('bin/immerslides.mjs');
+const { version } = JSON.parse(readFileSync('package.json', 'utf8')) as {
+  version: string;
+};
 
 it('creates a standalone starter with the exact packaged project skill', () => {
   const parent = mkdtempSync(path.join(tmpdir(), 'immerslides-cli-'));
@@ -22,7 +25,7 @@ it('creates a standalone starter with the exact packaged project skill', () => {
     readFileSync(path.join(target, 'package.json'), 'utf8'),
   );
   expect(project.name).toBe('my-talk');
-  expect(project.dependencies['immerslides']).toBe('^0.1.0');
+  expect(project.dependencies['immerslides']).toBe(`^${version}`);
   expect(project.engines.node).toBe('>=26.0.0');
   expect(readFileSync(path.join(target, '.nvmrc'), 'utf8')).toBe('26\n');
   expect(
