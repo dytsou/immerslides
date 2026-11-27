@@ -20,6 +20,19 @@ async function jump(page: Page, id: string) {
   await expect(current(page)).toHaveAttribute('data-slide', id);
 }
 
+// The close button closes its own popup, so the click can lose the race with the
+// browser tearing that page down. The popup closing is the outcome under test.
+async function clickClosingWindow(presenter: Page, name: string) {
+  const closed = presenter.waitForEvent('close');
+  await presenter
+    .getByRole('button', { name })
+    .click()
+    .catch((error: unknown) => {
+      if (!presenter.isClosed()) throw error;
+    });
+  await closed;
+}
+
 test('opens one styled presenter window with private notes and a still next preview', async ({
   page,
   context,
@@ -152,7 +165,7 @@ test('pauses and resets the clock, closes and reopens, and closes with the audie
   await expect(
     presenter.getByRole('button', { name: '暫停計時' }),
   ).toBeVisible();
-  await presenter.getByRole('button', { name: '關閉簡報者模式' }).click();
+  await clickClosingWindow(presenter, '關閉簡報者模式');
   await expect.poll(() => presenter.isClosed()).toBe(true);
   await expect.poll(() => context.pages().length).toBe(1);
   const reopened = page.waitForEvent('popup');

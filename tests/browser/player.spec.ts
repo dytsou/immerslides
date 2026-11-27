@@ -20,6 +20,16 @@ async function settle(page: import('@playwright/test').Page) {
     .toBe(0);
 }
 
+// Keyboard shortcuts are wired in an effect that runs after the first paint, so
+// wait for the player to report ready before the first key press.
+async function openDeck(page: import('@playwright/test').Page) {
+  await page.goto('/');
+  await expect(page.locator('.presentation-player')).toHaveAttribute(
+    'data-ready',
+    'true',
+  );
+}
+
 async function jump(page: import('@playwright/test').Page, id: string) {
   await page.keyboard.press('o');
   await page.locator(`.slide-list [data-target="${id}"]`).click();
@@ -35,7 +45,7 @@ async function jump(page: import('@playwright/test').Page, id: string) {
 test('advances whole pages, restores progress, and supports the feature tour', async ({
   page,
 }) => {
-  await page.goto('/');
+  await openDeck(page);
   await expect(current(page)).toHaveAttribute('data-slide', 'cover');
   await page.keyboard.press('ArrowRight');
   await expect(current(page)).toHaveAttribute('data-slide', 'overview');
@@ -90,7 +100,7 @@ test('advances whole pages, restores progress, and supports the feature tour', a
 test('keeps the chapter rail mounted and smoothly retargets chapter movement', async ({
   page,
 }) => {
-  await page.goto('/');
+  await openDeck(page);
   await jump(page, 'previews');
   const track = page.locator('.immerslides-guide-overlay .immerslides-rail ol');
   const identity = await track.evaluate((element) => {
@@ -148,7 +158,7 @@ test('keeps the chapter rail mounted and smoothly retargets chapter movement', a
 test('never paints the outgoing page again after its transition ends', async ({
   page,
 }) => {
-  await page.goto('/');
+  await openDeck(page);
   await jump(page, 'composition');
   await page.evaluate(() => {
     const store = window as unknown as { staleFrames: string[] };
@@ -192,7 +202,7 @@ test('uses reduced motion and keeps the fixed stage in a narrow viewport', async
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await openDeck(page);
   await page.keyboard.press('ArrowRight');
   await expect(current(page)).toHaveAttribute('data-slide', 'overview');
   await expect(current(page)).toHaveAttribute('data-still', 'true');
@@ -207,7 +217,7 @@ test('uses reduced motion and keeps the fixed stage in a narrow viewport', async
 
 test('keeps every feature page above the footer', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/');
+  await openDeck(page);
   await page.keyboard.press('o');
   const ids = await page
     .locator('.slide-list [data-target]')
@@ -243,7 +253,7 @@ test('keeps every feature page above the footer', async ({ page }) => {
 test('walks code sections without changing the source and reverses rapidly', async ({
   page,
 }) => {
-  await page.goto('/');
+  await openDeck(page);
   await jump(page, 'code');
   const walkthrough = current(page).locator('.immerslides-code-walkthrough');
   const code = walkthrough.locator('code');
@@ -304,7 +314,7 @@ test('walks code sections without changing the source and reverses rapidly', asy
 test('walks flows and freely composed parts using the same player step', async ({
   page,
 }) => {
-  await page.goto('/');
+  await openDeck(page);
   await jump(page, 'timeline');
   const flow = current(page).locator('.immerslides-flow-walkthrough');
   for (const [index, id] of ['input', 'validate', 'submit'].entries()) {
@@ -349,7 +359,7 @@ test('walks flows and freely composed parts using the same player step', async (
 test('keeps walkthrough previews still and honors reduced motion for composed parts', async ({
   page,
 }) => {
-  await page.goto('/');
+  await openDeck(page);
   await jump(page, 'previews');
   const preview = current(page).locator('.immerslides-preview');
   await expect(
